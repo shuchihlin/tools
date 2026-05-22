@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>電阻元件應用電路</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+  :root {
+    --bg: #0a1a0f;
+    --panel: #0f1f14;
+    --border: #1a3a22;
+    --accent: #4ade80;
+    --accent2: #facc15;
+    --accent3: #38bdf8;
+    --accent4: #fb923c;
+    --text: #d1f0da;
+    --text-dim: #4a7a55;
+    --wire: #4ade80;
+    --component: #facc15;
+    --glow: rgba(74,222,128,0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+    background-image:
+      radial-gradient(ellipse at 15% 25%, rgba(20,80,30,0.2) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 75%, rgba(56,189,248,0.06) 0%, transparent 55%);
+  }
+
+  h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.3rem;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 4px;
+    padding: 16px 0 6px;
+    text-shadow: 0 0 24px var(--glow);
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 22px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 3px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 7px 13px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { border-color: var(--accent); color: var(--accent); }
+  .tab.active {
+    background: rgba(74,222,128,0.08);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 14px rgba(74,222,128,0.15);
+  }
+
+  .content { display: none; }
+  .content.active { display: block; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+
+  svg { width: 100%; height: auto; display: block; }
+
+  .wire { stroke: var(--wire); stroke-width: 2; fill: none; }
+  .wire-thin { stroke: var(--wire); stroke-width: 1.5; fill: none; opacity: 0.6; }
+  .comp { stroke: var(--component); stroke-width: 2; fill: none; }
+  .comp-fill { fill: rgba(250,204,21,0.1); stroke: var(--component); stroke-width: 1.5; }
+  .gnd { stroke: #2a4a30; stroke-width: 2; fill: none; }
+  .lbl { font-family: 'IBM Plex Mono', monospace; fill: var(--text); font-size: 10px; }
+  .lbl-g { font-family: 'IBM Plex Mono', monospace; fill: var(--accent); font-size: 10px; }
+  .lbl-y { font-family: 'IBM Plex Mono', monospace; fill: var(--component); font-size: 10px; }
+  .lbl-b { font-family: 'IBM Plex Mono', monospace; fill: var(--accent3); font-size: 10px; }
+  .lbl-o { font-family: 'IBM Plex Mono', monospace; fill: var(--accent4); font-size: 10px; }
+  .node { fill: var(--accent); }
+
+  /* Resistor zigzag */
+  .res { stroke: var(--component); stroke-width: 2; fill: none; }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .info-item {
+    background: rgba(74,222,128,0.04);
+    border: 1px solid rgba(74,222,128,0.1);
+    border-radius: 4px;
+    padding: 9px 11px;
+  }
+
+  .info-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-bottom: 3px;
+    letter-spacing: 1px;
+  }
+
+  .info-value { font-size: 0.82rem; color: var(--text); }
+
+  .formula {
+    background: rgba(56,189,248,0.05);
+    border-left: 3px solid var(--accent3);
+    border-radius: 0 4px 4px 0;
+    padding: 9px 13px;
+    margin: 10px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent3);
+    letter-spacing: 1px;
+    line-height: 1.6;
+  }
+
+  .principle {
+    font-size: 0.83rem;
+    line-height: 1.75;
+    color: var(--text);
+    margin-top: 8px;
+  }
+
+  .principle strong { color: var(--accent); }
+
+  .badge {
+    display: inline-block;
+    background: rgba(250,204,21,0.08);
+    border: 1px solid rgba(250,204,21,0.3);
+    color: var(--accent2);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin: 2px;
+    letter-spacing: 1px;
+  }
+
+  @keyframes flow { to { stroke-dashoffset: -20; } }
+  .flow { stroke-dasharray: 5 4; animation: flow 0.9s linear infinite; }
+
+  @keyframes heat {
+    0%,100% { fill: rgba(251,146,60,0.1); }
+    50% { fill: rgba(251,146,60,0.4); }
+  }
+  .heat { animation: heat 1.5s ease-in-out infinite; }
+
+  @keyframes gp {
+    0%,100% { filter: drop-shadow(0 0 2px #4ade80); }
+    50% { filter: drop-shadow(0 0 7px #4ade80); }
+  }
+  .gp { animation: gp 2s ease-in-out infinite; }
+
+  @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:1} }
+  .blink { animation: blink 1s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<h1>⚡ 電阻元件應用電路</h1>
+<div class="subtitle">RESISTOR CIRCUIT APPLICATIONS</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="show('divider')">分壓電路</div>
+  <div class="tab" onclick="show('led')">LED 限流</div>
+  <div class="tab" onclick="show('pullup')">上拉/下拉</div>
+  <div class="tab" onclick="show('opamp')">運算放大器</div>
+</div>
+
+<!-- ===== 1. VOLTAGE DIVIDER ===== -->
+<div class="content active" id="divider">
+  <div class="card">
+    <div class="card-title">▶ 分壓電路（Voltage Divider）</div>
+    <div class="two-col">
+      <div>
+        <svg viewBox="0 0 320 220">
+          <!-- VIN -->
+          <text x="136" y="16" class="lbl-g" text-anchor="middle">Vin = 5V</text>
+          <line x1="136" y1="20" x2="136" y2="38" class="wire"/>
+
+          <!-- R1 -->
+          <path d="M136,38 L130,42 L142,48 L130,54 L142,60 L130,66 L142,72 L136,76" class="res gp"/>
+          <text x="152" y="52" class="lbl-y">R1</text>
+          <text x="152" y="63" class="lbl" style="font-size:9px">10KΩ</text>
+          <!-- Heat glow R1 -->
+          <rect x="128" y="38" width="16" height="38" rx="3" class="heat" style="stroke:none"/>
+
+          <!-- Midpoint -->
+          <line x1="136" y1="76" x2="136" y2="88" class="wire"/>
+          <circle cx="136" cy="88" r="4" class="node gp"/>
+          <!-- Vout tap -->
+          <line x1="136" y1="88" x2="220" y2="88" class="wire flow"/>
+          <text x="224" y="84" class="lbl-g">Vout</text>
+          <text x="224" y="96" class="lbl" style="font-size:9px">2.5V</text>
+          <!-- ADC load hint -->
+          <rect x="224" y="100" width="40" height="20" rx="2" style="fill:rgba(56,189,248,0.08);stroke:#38bdf8;stroke-width:1"/>
+          <text x="244" y="114" class="lbl-b" text-anchor="middle" style="font-size:8px">ADC</text>
+
+          <!-- R2 -->
+          <path d="M136,88 L130,92 L142,98 L130,104 L142,110 L130,116 L142,122 L136,126" class="res"/>
+          <text x="152" y="102" class="lbl-y">R2</text>
+          <text x="152" y="113" class="lbl" style="font-size:9px">10KΩ</text>
+          <rect x="128" y="88" width="16" height="38" rx="3" class="heat" style="stroke:none"/>
+
+          <!-- GND -->
+          <line x1="136" y1="126" x2="136" y2="150" class="wire"/>
+          <line x1="118" y1="150" x2="154" y2="150" class="gnd"/>
+          <line x1="123" y1="157" x2="149" y2="157" class="gnd"/>
+          <line x1="128" y1="164" x2="144" y2="164" class="gnd"/>
+
+          <!-- Formula annotation -->
+          <text x="30" y="88" class="lbl-b" style="font-size:9px">Vout =</text>
+          <text x="30" y="100" class="lbl-b" style="font-size:9px">Vin × R2</text>
+          <text x="30" y="112" class="lbl-b" style="font-size:9px">────────</text>
+          <text x="30" y="124" class="lbl-b" style="font-size:9px">R1 + R2</text>
+
+          <!-- NTC thermistor variant hint -->
+          <text x="30" y="175" class="lbl" style="font-size:8px">※ 若 R2 換成</text>
+          <text x="30" y="186" class="lbl" style="font-size:8px">NTC → 溫度感測</text>
+          <text x="30" y="197" class="lbl" style="font-size:8px">光敏電阻 → 光感測</text>
+        </svg>
+      </div>
+      <div>
+        <div class="formula">Vout = Vin × R2/(R1+R2)<br>R1=R2 → Vout = Vin/2<br>調整比值 → 任意電壓</div>
+        <p class="principle">
+          <strong>工作原理：</strong><br>
+          兩個電阻串聯，電流相同，電壓依<strong>電阻比例分配</strong>（歐姆定律）。<br><br>
+          中間節點電壓即 Vout，接 ADC 可量測。<br><br>
+          <strong>實際應用</strong>：將 R2 換成 NTC 熱敏電阻，Vout 隨溫度變化 → 溫度感測器。換成光敏電阻（LDR）→ 光線感測。這是感測器電路的基礎結構。
+        </p>
+        <div style="margin-top:10px">
+          <span class="badge">ADC 輸入</span>
+          <span class="badge">溫度感測</span>
+          <span class="badge">電壓縮放</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">核心定律</div><div class="info-value">歐姆定律 V = IR</div></div>
+      <div class="info-item"><div class="info-label">典型應用</div><div class="info-value">感測器偏壓、ADC 前端、電壓縮放</div></div>
+      <div class="info-item"><div class="info-label">設計注意</div><div class="info-value">負載阻抗需遠大於 R1+R2</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 2. LED CURRENT LIMITING ===== -->
+<div class="content" id="led">
+  <div class="card">
+    <div class="card-title">▶ LED 限流電阻</div>
+    <div class="two-col">
+      <div>
+        <svg viewBox="0 0 320 200">
+          <!-- VCC -->
+          <text x="160" y="16" class="lbl-g" text-anchor="middle">VCC = 5V</text>
+          <line x1="160" y1="20" x2="160" y2="38" class="wire flow"/>
+
+          <!-- Resistor R -->
+          <path d="M160,38 L154,42 L166,48 L154,54 L166,60 L154,66 L166,72 L160,76" class="res gp"/>
+          <text x="176" y="52" class="lbl-y">R</text>
+          <text x="176" y="63" class="lbl" style="font-size:9px">150Ω</text>
+          <rect x="152" y="38" width="16" height="38" rx="3" class="heat" style="stroke:none"/>
+
+          <!-- Wire to LED -->
+          <line x1="160" y1="76" x2="160" y2="96" class="wire"/>
+
+          <!-- LED symbol -->
+          <polygon points="148,96 172,96 160,116" class="comp-fill" style="fill:rgba(250,204,21,0.2)"/>
+          <line x1="172" y1="96" x2="172" y2="116" class="comp"/>
+          <line x1="148" y1="116" x2="172" y2="116" class="wire"/>
+          <!-- LED light rays -->
+          <line x1="176" y1="100" x2="186" y2="94" stroke="#facc15" stroke-width="1.5" class="blink"/>
+          <line x1="178" y1="106" x2="190" y2="104" stroke="#facc15" stroke-width="1.5" class="blink" style="animation-delay:0.3s"/>
+          <line x1="176" y1="112" x2="186" y2="118" stroke="#facc15" stroke-width="1.5" class="blink" style="animation-delay:0.6s"/>
+          <text x="192" y="100" class="lbl-y" style="font-size:9px">LED</text>
+          <text x="192" y="112" class="lbl" style="font-size:8px">Vf=2V</text>
+          <text x="192" y="122" class="lbl" style="font-size:8px">If=20mA</text>
+
+          <!-- GND -->
+          <line x1="160" y1="116" x2="160" y2="150" class="wire"/>
+          <line x1="142" y1="150" x2="178" y2="150" class="gnd"/>
+          <line x1="147" y1="157" x2="173" y2="157" class="gnd"/>
+          <line x1="152" y1="164" x2="168" y2="164" class="gnd"/>
+
+          <!-- Calculation -->
+          <text x="20" y="50" class="lbl-b" style="font-size:9px">R = (Vcc - Vf)</text>
+          <text x="20" y="62" class="lbl-b" style="font-size:9px">──────────</text>
+          <text x="20" y="74" class="lbl-b" style="font-size:9px">    If</text>
+          <text x="20" y="90" class="lbl" style="font-size:9px">= (5 - 2) / 0.02</text>
+          <text x="20" y="102" class="lbl" style="font-size:9px">= 150 Ω</text>
+
+          <!-- No resistor warning -->
+          <rect x="20" y="130" width="110" height="36" rx="3" style="fill:rgba(251,146,60,0.08);stroke:#fb923c;stroke-width:1"/>
+          <text x="75" y="146" class="lbl-o" text-anchor="middle" style="font-size:8px">⚠ 無限流電阻</text>
+          <text x="75" y="158" class="lbl-o" text-anchor="middle" style="font-size:8px">→ LED 立即燒毀</text>
+        </svg>
+      </div>
+      <div>
+        <div class="formula">R = (Vcc - Vf) / If<br>Vf = LED 順向電壓<br>If = 工作電流（一般 10~20mA）</div>
+        <p class="principle">
+          <strong>工作原理：</strong><br>
+          LED 本身<strong>沒有限流能力</strong>，直接接電源會因電流過大瞬間燒毀。<br><br>
+          電阻消耗多餘電壓（Vcc - Vf），將電流限制在安全範圍。<br><br>
+          <strong>計算範例</strong>：Vcc=5V，Vf=2V，If=20mA<br>
+          R = (5-2) / 0.02 = <strong>150Ω</strong>
+        </p>
+        <div style="margin-top:10px">
+          <span class="badge">LED 驅動</span>
+          <span class="badge">指示燈</span>
+          <span class="badge">GPIO 保護</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">核心功能</div><div class="info-value">消耗多餘電壓，限制電流</div></div>
+      <div class="info-item"><div class="info-label">常見 Vf</div><div class="info-value">紅/黃 2V，藍/白/綠 3~3.5V</div></div>
+      <div class="info-item"><div class="info-label">設計原則</div><div class="info-value">寧大勿小，避免過流燒毀</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 3. PULL-UP / PULL-DOWN ===== -->
+<div class="content" id="pullup">
+  <div class="card">
+    <div class="card-title">▶ 上拉 / 下拉電阻（Pull-up / Pull-down）</div>
+    <div class="two-col">
+      <div>
+        <svg viewBox="0 0 320 220">
+          <!-- PULL-UP side -->
+          <text x="80" y="14" class="lbl-g" text-anchor="middle" style="font-size:9px">上拉電阻</text>
+          <text x="80" y="24" class="lbl" text-anchor="middle" style="font-size:8px">Pull-up</text>
+
+          <!-- VCC -->
+          <text x="80" y="40" class="lbl-g" text-anchor="middle" style="font-size:9px">VCC 3.3V</text>
+          <line x1="80" y1="44" x2="80" y2="58" class="wire"/>
+
+          <!-- R pull-up -->
+          <path d="M80,58 L74,62 L86,68 L74,74 L86,80 L74,86 L86,92 L80,96" class="res gp"/>
+          <text x="92" y="74" class="lbl-y" style="font-size:9px">R 10K</text>
+
+          <!-- Node point -->
+          <line x1="80" y1="96" x2="80" y2="110" class="wire"/>
+          <circle cx="80" cy="110" r="4" class="node"/>
+          <!-- To MCU GPIO -->
+          <line x1="80" y1="110" x2="140" y2="110" class="wire flow"/>
+          <rect x="140" y="100" width="36" height="20" rx="2" style="fill:rgba(74,222,128,0.08);stroke:#4ade80;stroke-width:1"/>
+          <text x="158" y="114" class="lbl-g" text-anchor="middle" style="font-size:8px">GPIO</text>
+
+          <!-- Switch to GND -->
+          <line x1="80" y1="110" x2="80" y2="140" class="wire"/>
+          <!-- Switch symbol -->
+          <circle cx="80" cy="145" r="4" comp style="fill:none;stroke:#facc15;stroke-width:1.5"/>
+          <line x1="80" y1="140" x2="80" y2="141" class="comp"/>
+          <line x1="80" y1="136" x2="94" y2="130" class="comp"/>
+          <text x="98" y="134" class="lbl-y" style="font-size:8px">SW</text>
+          <line x1="80" y1="149" x2="80" y2="165" class="wire"/>
+          <line x1="64" y1="165" x2="96" y2="165" class="gnd"/>
+          <line x1="69" y1="171" x2="91" y2="171" class="gnd"/>
+          <line x1="74" y1="177" x2="86" y2="177" class="gnd"/>
+
+          <!-- State labels -->
+          <text x="10" y="110" class="lbl-g" style="font-size:8px">SW開：HIGH</text>
+          <text x="10" y="122" class="lbl-o" style="font-size:8px">SW關：LOW</text>
+
+          <!-- PULL-DOWN side -->
+          <text x="250" y="14" class="lbl-b" text-anchor="middle" style="font-size:9px">下拉電阻</text>
+          <text x="250" y="24" class="lbl" text-anchor="middle" style="font-size:8px">Pull-down</text>
+
+          <!-- Switch from VCC -->
+          <text x="250" y="42" class="lbl-g" text-anchor="middle" style="font-size:9px">VCC</text>
+          <line x1="250" y1="46" x2="250" y2="60" class="wire"/>
+          <line x1="250" y1="60" x2="264" y2="54" class="comp"/>
+          <circle cx="250" cy="65" r="4" style="fill:none;stroke:#facc15;stroke-width:1.5"/>
+          <text x="268" y="58" class="lbl-y" style="font-size:8px">SW</text>
+          <line x1="250" y1="69" x2="250" y2="84" class="wire"/>
+
+          <!-- Node -->
+          <circle cx="250" cy="84" r="4" class="node"/>
+          <line x1="250" y1="84" x2="196" y2="84" class="wire flow" style="animation-direction:reverse"/>
+          <rect x="160" y="74" width="36" height="20" rx="2" style="fill:rgba(74,222,128,0.08);stroke:#4ade80;stroke-width:1"/>
+          <text x="178" y="88" class="lbl-g" text-anchor="middle" style="font-size:8px">GPIO</text>
+
+          <!-- R pull-down -->
+          <line x1="250" y1="84" x2="250" y2="98" class="wire"/>
+          <path d="M250,98 L244,102 L256,108 L244,114 L256,120 L244,126 L256,132 L250,136" class="res"/>
+          <text x="262" y="116" class="lbl-y" style="font-size:9px">R 10K</text>
+
+          <!-- GND -->
+          <line x1="250" y1="136" x2="250" y2="165" class="wire"/>
+          <line x1="234" y1="165" x2="266" y2="165" class="gnd"/>
+          <line x1="239" y1="171" x2="261" y2="171" class="gnd"/>
+          <line x1="244" y1="177" x2="256" y2="177" class="gnd"/>
+
+          <!-- State labels -->
+          <text x="190" y="110" class="lbl-g" style="font-size:8px">SW關：HIGH</text>
+          <text x="190" y="122" class="lbl-o" style="font-size:8px">SW開：LOW</text>
+        </svg>
+      </div>
+      <div>
+        <div class="formula">上拉：空接→HIGH（VCC）<br>按下→LOW（GND）<br><br>下拉：空接→LOW（GND）<br>按下→HIGH（VCC）</div>
+        <p class="principle">
+          <strong>工作原理：</strong><br>
+          GPIO 在沒有明確驅動時，輸入端會<strong>浮接（floating）</strong>，讀值不穩定，可能亂跳 0/1。<br><br>
+          <strong>上拉電阻</strong>：將線路拉到 VCC，確保空接時為 HIGH；按鈕按下接地變 LOW。<br><br>
+          <strong>下拉電阻</strong>：將線路拉到 GND，確保空接時為 LOW；按鈕按下接 VCC 變 HIGH。<br><br>
+          典型值 <strong>10KΩ</strong>：夠大不浪費電流，夠小不受雜訊干擾。
+        </p>
+        <div style="margin-top:10px">
+          <span class="badge">按鍵輸入</span>
+          <span class="badge">I2C 匯流排</span>
+          <span class="badge">開漏輸出</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">問題根源</div><div class="info-value">浮接輸入讀值不穩定</div></div>
+      <div class="info-item"><div class="info-label">典型阻值</div><div class="info-value">4.7KΩ ~ 10KΩ</div></div>
+      <div class="info-item"><div class="info-label">I2C 特別</div><div class="info-value">SDA/SCL 必須加上拉電阻</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 4. OP-AMP ===== -->
+<div class="content" id="opamp">
+  <div class="card">
+    <div class="card-title">▶ 運算放大器增益設定（反相放大器）</div>
+    <div class="two-col">
+      <div>
+        <svg viewBox="0 0 320 200">
+          <!-- Op-amp triangle -->
+          <polygon points="160,60 160,140 230,100" style="fill:rgba(74,222,128,0.06);stroke:#4ade80;stroke-width:1.5"/>
+          <text x="193" y="96" class="lbl-g" text-anchor="middle" style="font-size:10px">Op</text>
+          <text x="193" y="108" class="lbl-g" text-anchor="middle" style="font-size:10px">Amp</text>
+
+          <!-- Inverting input (-) -->
+          <line x1="110" y1="80" x2="160" y2="80" class="wire"/>
+          <text x="155" y="77" class="lbl" style="font-size:9px">−</text>
+          <circle cx="110" cy="80" r="3" class="node"/>
+
+          <!-- Non-inverting input (+) grounded -->
+          <line x1="110" y1="120" x2="160" y2="120" class="wire"/>
+          <text x="155" y="117" class="lbl" style="font-size:9px">+</text>
+          <line x1="110" y1="120" x2="110" y2="150" class="wire"/>
+          <line x1="94" y1="150" x2="126" y2="150" class="gnd"/>
+          <line x1="99" y1="156" x2="121" y2="156" class="gnd"/>
+          <line x1="104" y1="162" x2="116" y2="162" class="gnd"/>
+
+          <!-- Rin from Vin to inv input -->
+          <line x1="40" y1="80" x2="70" y2="80" class="wire flow"/>
+          <path d="M70,80 L64,84 L76,90 L64,96 L76,102 L64,108 L76,114 L70,118" class="res" style="transform:rotate(-90deg) translate(-80px, 70px)"/>
+          <!-- Rin horizontal -->
+          <path d="M70,80 L74,76 L80,84 L86,76 L92,84 L98,76 L104,84 L110,80" class="res gp"/>
+          <text x="90" y="70" class="lbl-y" text-anchor="middle" style="font-size:9px">Rin</text>
+          <text x="90" y="61" class="lbl" text-anchor="middle" style="font-size:8px">10KΩ</text>
+          <text x="30" y="78" class="lbl-b" style="font-size:9px">Vin</text>
+          <text x="28" y="90" class="lbl" style="font-size:8px">1V</text>
+
+          <!-- Feedback Rf from output to inv input -->
+          <line x1="230" y1="100" x2="260" y2="100" class="wire"/>
+          <circle cx="260" cy="100" r="3" class="node"/>
+          <line x1="260" y1="100" x2="260" y2="60" class="wire"/>
+          <line x1="110" y1="60" x2="260" y2="60" class="wire"/>
+          <!-- Rf horizontal across top -->
+          <path d="M130,60 L134,56 L140,64 L146,56 L152,64 L158,56 L164,64 L168,60" class="res"/>
+          <text x="150" y="50" class="lbl-y" text-anchor="middle" style="font-size:9px">Rf</text>
+          <text x="150" y="41" class="lbl" text-anchor="middle" style="font-size:8px">100KΩ</text>
+
+          <!-- Output -->
+          <line x1="260" y1="100" x2="300" y2="100" class="wire flow"/>
+          <text x="280" y="92" class="lbl-o" text-anchor="middle" style="font-size:9px">Vout</text>
+          <text x="280" y="112" class="lbl-o" text-anchor="middle" style="font-size:8px">−10V</text>
+
+          <!-- Gain annotation -->
+          <text x="20" y="178" class="lbl-b" style="font-size:9px">Gain = −Rf/Rin = −100K/10K = −10×</text>
+          <text x="20" y="192" class="lbl" style="font-size:8px">負號 = 反相（輸出相位相反）</text>
+        </svg>
+      </div>
+      <div>
+        <div class="formula">Vout = −(Rf/Rin) × Vin<br>增益 = −Rf/Rin<br>兩個電阻比值決定放大倍數</div>
+        <p class="principle">
+          <strong>工作原理：</strong><br>
+          運算放大器本身增益極高（100dB+），<strong>靠兩個電阻的比值</strong>決定實際增益，這叫做<strong>負回授（Negative Feedback）</strong>。<br><br>
+          <strong>Rin</strong>：輸入電阻，決定輸入阻抗。<br>
+          <strong>Rf</strong>：回授電阻，決定放大倍數。<br><br>
+          增益 = Rf/Rin（反相，輸出極性相反）。要改增益，只需換一顆電阻，不改 IC。
+        </p>
+        <div style="margin-top:10px">
+          <span class="badge">音頻放大</span>
+          <span class="badge">感測器放大</span>
+          <span class="badge">信號調理</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">核心概念</div><div class="info-value">電阻比值 = 放大倍數</div></div>
+      <div class="info-item"><div class="info-label">典型應用</div><div class="info-value">麥克風放大、儀表放大、濾波器</div></div>
+      <div class="info-item"><div class="info-label">設計彈性</div><div class="info-value">換 Rf 即可改變增益，不換 IC</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
