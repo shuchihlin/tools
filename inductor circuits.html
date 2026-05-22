@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>電感元件應用電路</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --panel: #111827;
+    --border: #1e3a5f;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff14;
+    --text: #c8d8e8;
+    --text-dim: #5a7a9a;
+    --wire: #00d4ff;
+    --component: #ff6b35;
+    --glow: rgba(0,212,255,0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(0,80,160,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(0,180,120,0.08) 0%, transparent 60%);
+  }
+
+  h1 {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.4rem;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 3px;
+    padding: 16px 0 8px;
+    text-shadow: 0 0 20px var(--glow);
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 2px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .tab {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { border-color: var(--accent); color: var(--accent); }
+  .tab.active {
+    background: rgba(0,212,255,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(0,212,255,0.2);
+  }
+
+  .content { display: none; }
+  .content.active { display: block; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* SVG Circuit styles */
+  svg { width: 100%; height: auto; display: block; }
+
+  .wire { stroke: var(--wire); stroke-width: 2; fill: none; }
+  .wire-thin { stroke: var(--wire); stroke-width: 1.5; fill: none; opacity: 0.7; }
+  .component-body { stroke: var(--component); stroke-width: 2; fill: none; }
+  .component-fill { fill: rgba(255,107,53,0.15); stroke: var(--component); stroke-width: 1.5; }
+  .gnd { stroke: var(--text-dim); stroke-width: 2; fill: none; }
+  .label { font-family: 'Share Tech Mono', monospace; fill: var(--text); font-size: 11px; }
+  .label-accent { font-family: 'Share Tech Mono', monospace; fill: var(--accent); font-size: 11px; }
+  .label-orange { font-family: 'Share Tech Mono', monospace; fill: var(--component); font-size: 11px; }
+  .label-green { font-family: 'Share Tech Mono', monospace; fill: var(--accent3); font-size: 11px; }
+  .node { fill: var(--accent); }
+  .vcc { fill: var(--accent); font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+
+  /* Animated current flow */
+  .current-dot {
+    fill: var(--accent);
+    filter: drop-shadow(0 0 3px var(--accent));
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .info-item {
+    background: rgba(0,212,255,0.05);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+
+  .info-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  .info-value {
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  .formula {
+    background: rgba(57,255,20,0.05);
+    border-left: 3px solid var(--accent3);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--accent3);
+    letter-spacing: 1px;
+  }
+
+  .principle {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-top: 10px;
+  }
+
+  .principle strong { color: var(--accent); }
+
+  .badge {
+    display: inline-block;
+    background: rgba(255,107,53,0.15);
+    border: 1px solid rgba(255,107,53,0.4);
+    color: var(--accent2);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin: 2px;
+    letter-spacing: 1px;
+  }
+
+  /* Waveform animation */
+  @keyframes dash {
+    to { stroke-dashoffset: -20; }
+  }
+  .current-flow {
+    stroke-dasharray: 6 4;
+    animation: dash 0.8s linear infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+  .pulse { animation: pulse 1.5s ease-in-out infinite; }
+
+  @keyframes glow-pulse {
+    0%, 100% { filter: drop-shadow(0 0 2px #00d4ff); }
+    50% { filter: drop-shadow(0 0 8px #00d4ff); }
+  }
+  .glow-anim { animation: glow-pulse 2s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<h1>⚡ 電感元件應用電路</h1>
+<div class="subtitle">INDUCTOR CIRCUIT APPLICATIONS</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="show('boost')">升壓電路</div>
+  <div class="tab" onclick="show('filter')">LC 濾波器</div>
+  <div class="tab" onclick="show('relay')">繼電器驅動</div>
+  <div class="tab" onclick="show('transformer')">變壓器</div>
+</div>
+
+<!-- ===== 1. BOOST CONVERTER ===== -->
+<div class="content active" id="boost">
+  <div class="card">
+    <div class="card-title">▶ BOOST CONVERTER — 升壓 DC-DC 轉換器</div>
+    <div class="two-col">
+      <div>
+        <svg viewBox="0 0 320 200">
+          <!-- VIN -->
+          <text x="10" y="55" class="label-accent">Vin</text>
+          <text x="6" y="68" class="label" style="font-size:9px">3.3V</text>
+          <!-- Battery symbol -->
+          <line x1="30" y1="60" x2="30" y2="80" class="wire"/>
+          <line x1="22" y1="65" x2="38" y2="65" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="25" y1="72" x2="35" y2="72" stroke="#00d4ff" stroke-width="1.5"/>
+          <!-- Top wire from Vin -->
+          <line x1="30" y1="60" x2="80" y2="60" class="wire current-flow"/>
+          <!-- Inductor L1 -->
+          <path d="M80,60 C84,60 84,50 88,50 C92,50 92,70 96,70 C100,70 100,50 104,50 C108,50 108,70 112,70 C116,70 116,50 120,50 C124,50 124,60 128,60" class="component-body glow-anim"/>
+          <text x="96" y="45" class="label-orange" text-anchor="middle">L1</text>
+          <text x="96" y="37" class="label" text-anchor="middle" style="font-size:9px">100µH</text>
+          <!-- Wire after inductor to switch node -->
+          <line x1="128" y1="60" x2="180" y2="60" class="wire"/>
+          <circle cx="180" cy="60" r="3" class="node"/>
+          <!-- MOSFET (switch) Q1 going down -->
+          <line x1="180" y1="60" x2="180" y2="85" class="wire"/>
+          <!-- MOSFET body -->
+          <rect x="166" y="85" width="28" height="22" rx="2" class="component-fill"/>
+          <text x="180" y="99" class="label-orange" text-anchor="middle" style="font-size:10px">Q1</text>
+          <!-- Gate -->
+          <line x1="154" y1="96" x2="166" y2="96" class="wire-thin"/>
+          <text x="148" y="99" class="label" text-anchor="middle" style="font-size:9px">PWM</text>
+          <!-- MOSFET drain to GND -->
+          <line x1="180" y1="107" x2="180" y2="130" class="wire"/>
+          <!-- GND -->
+          <line x1="160" y1="130" x2="200" y2="130" class="gnd"/>
+          <line x1="166" y1="135" x2="194" y2="135" class="gnd"/>
+          <line x1="172" y1="140" x2="188" y2="140" class="gnd"/>
+          <!-- Diode D1 -->
+          <line x1="180" y1="60" x2="220" y2="60" class="wire"/>
+          <!-- Diode symbol -->
+          <polygon points="220,52 236,60 220,68" class="component-fill"/>
+          <line x1="236" y1="52" x2="236" y2="68" class="component-body"/>
+          <text x="228" y="48" class="label-orange" text-anchor="middle" style="font-size:9px">D1</text>
+          <!-- Wire after diode -->
+          <line x1="236" y1="60" x2="280" y2="60" class="wire current-flow"/>
+          <circle cx="280" cy="60" r="3" class="node"/>
+          <!-- Capacitor C1 -->
+          <line x1="280" y1="60" x2="280" y2="90" class="wire"/>
+          <line x1="268" y1="90" x2="292" y2="90" class="component-body"/>
+          <line x1="268" y1="96" x2="292" y2="96" class="component-body"/>
+          <text x="298" y="94" class="label-orange" style="font-size:9px">C1</text>
+          <line x1="280" y1="96" x2="280" y2="130" class="wire"/>
+          <!-- Output -->
+          <text x="300" y="55" class="label-accent">Vout</text>
+          <text x="296" y="68" class="label" style="font-size:9px">5V</text>
+          <line x1="280" y1="60" x2="310" y2="60" class="wire-thin pulse"/>
+          <!-- Bottom GND wire -->
+          <line x1="30" y1="80" x2="30" y2="130" class="wire"/>
+          <line x1="30" y1="130" x2="160" y2="130" class="wire"/>
+          <line x1="200" y1="130" x2="280" y2="130" class="wire"/>
+          <!-- GND bottom Vin -->
+          <line x1="20" y1="130" x2="40" y2="130" class="gnd"/>
+          <line x1="23" y1="135" x2="37" y2="135" class="gnd"/>
+          <line x1="26" y1="140" x2="34" y2="140" class="gnd"/>
+          <!-- Energy storage label -->
+          <text x="96" y="155" class="label" text-anchor="middle" style="font-size:9px">① Q1 ON → L1 儲能</text>
+          <text x="96" y="168" class="label" text-anchor="middle" style="font-size:9px">② Q1 OFF → L1 釋能升壓</text>
+        </svg>
+      </div>
+      <div>
+        <div class="formula">Vout = Vin × 1/(1-D)<br>D = 工作週期 (Duty Cycle)</div>
+        <p class="principle">
+          <strong>工作原理：</strong><br>
+          ① <strong>Q1 導通（ON）</strong>：電流流過電感 L1，電感儲存磁場能量，二極體 D1 截止。<br><br>
+          ② <strong>Q1 截止（OFF）</strong>：電感電流不能突變，產生感應電動勢，<strong>極性反轉</strong>疊加在 Vin 上，透過 D1 對電容 C1 充電 → 輸出電壓 > 輸入電壓。
+        </p>
+        <div style="margin-top:10px">
+          <span class="badge">Switch Mode</span>
+          <span class="badge">高效率 85-95%</span>
+          <span class="badge">手機充電器</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">核心特性</div>
+        <div class="info-value">電感電流不能瞬間突變</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">典型應用</div>
+        <div class="info-value">行動電源、LED 驅動、DC-DC 模組</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">開關頻率</div>
+        <div class="info-value">100kHz ~ 數 MHz</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 2. LC FILTER ===== -->
+<div class="content" id="filter">
+  <div class="card">
+    <div class="card-title">▶ LC 低通濾波器</div>
+    <div class="two-col">
+      <div>
+        <svg viewBox="0 0 320 180">
+          <!-- Input label -->
+          <text x="6" y="75" class="label-accent" style="font-size:10px">Vin</text>
+          <text x="4" y="87" class="label" style="font-size:8px">混合頻率</text>
+          <!-- Input wire -->
+          <line x1="28" y1="80" x2="70" y2="80" class="wire current-flow"/>
+          <!-- Inductor L -->
+          <path d="M70,80 C74,80 74,70 78,70 C82,70 82,90 86,90 C90,90 90,70 94,70 C98,70 98,90 102,90 C106,90 106,70 110,70 C114,70 114,80 118,80" class="component-body glow-anim"/>
+          <text x="94" y="62" class="label-orange" text-anchor="middle">L</text>
+          <text x="94" y="53" class="label" text-anchor="middle" style="font-size:9px">1mH</text>
+          <!-- Wire after L -->
+          <line x1="118" y1="80" x2="180" y2="80" class="wire"/>
+          <circle cx="180" cy="80" r="3" class="node"/>
+          <!-- Capacitor C vertical -->
+          <line x1="180" y1="80" x2="180" y2="108" class="wire"/>
+          <line x1="164" y1="108" x2="196" y2="108" class="component-body"/>
+          <line x1="164" y1="115" x2="196" y2="115" class="component-body"/>
+          <text x="204" y="113" class="label-orange" style="font-size:9px">C</text>
+          <text x="204" y="123" class="label" style="font-size:9px">10µF</text>
+          <line x1="180" y1="115" x2="180" y2="145" class="wire"/>
+          <!-- GND -->
+          <line x1="165" y1="145" x2="195" y2="145" class="gnd"/>
+          <line x1="170" y1="150" x2="190" y2="150" class="gnd"/>
+          <line x1="175" y1="155" x2="185" y2="155" class="gnd"/>
+          <!-- Output -->
+          <line x1="180" y1="80" x2="260" y2="80" class="wire pulse"/>
+          <text x="264" y="75" class="label-accent" style="font-size:10px">Vout</text>
+          <text x="262" y="87" class="label" style="font-size:8px">低頻通過</text>
+          <!-- Bottom GND wire -->
+          <line x1="28" y1="145" x2="165" y2="145" class="wire"/>
+          <line x1="10" y1="80" x2="28" y2="80" class="wire"/>
+          <line x1="10" y1="80" x2="10" y2="145" class="wire"/>
+          <line x1="10" y1="145" x2="28" y2="145" class="wire"/>
+          <!-- GND Vin side -->
+          <line x1="2" y1="145" x2="18" y2="145" class="gnd"/>
+          <line x1="5" y1="150" x2="15" y2="150" class="gnd"/>
+          <!-- Cutoff freq label -->
+          <text x="94" y="170" class="label-green" text-anchor="middle" style="font-size:10px">fc = 1 / (2π√LC) ≈ 1.59kHz</text>
+          <!-- High freq arrow blocked -->
+          <text x="148" y="62" class="label" style="font-size:9px;fill:#ff4444">✕ 高頻被阻</text>
+          <text x="220" y="62" class="label-green" style="font-size:9px">✓ 低頻通過</text>
+        </svg>
+      </div>
+      <div>
+        <div class="formula">fc = 1 / (2π√LC)<br>Xᴸ = 2πfL (感抗)<br>Xᴄ = 1/(2πfC) (容抗)</div>
+        <p class="principle">
+          <strong>工作原理：</strong><br>
+          <strong>電感對高頻阻抗高</strong>（感抗 XL = 2πfL，f 越高 XL 越大）→ 高頻信號被電感阻擋。<br><br>
+          <strong>電容對高頻阻抗低</strong>（容抗 XC = 1/2πfC）→ 殘餘高頻被電容旁路到地。<br><br>
+          兩者組合形成 <strong>截止頻率 fc</strong>，低於 fc 的信號通過，高於 fc 的衰減。
+        </p>
+        <div style="margin-top:10px">
+          <span class="badge">Audio 音頻</span>
+          <span class="badge">電源濾波</span>
+          <span class="badge">EMI 抑制</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">核心特性</div>
+        <div class="info-value">電感阻高頻，電容旁路高頻</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">典型應用</div>
+        <div class="info-value">擴大機輸出濾波、switching PSU、音響分音器</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">截止特性</div>
+        <div class="info-value">-40dB/decade（二階濾波）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 3. RELAY DRIVER ===== -->
+<div class="content" id="relay">
+  <div class="card">
+    <div class="card-title">▶ 繼電器驅動電路（電感保護）</div>
+    <div class="two-col">
+      <div>
+        <svg viewBox="0 0 320 210">
+          <!-- MCU/GPIO signal -->
+          <rect x="10" y="60" width="44" height="28" rx="3" class="component-fill"/>
+          <text x="32" y="76" class="label" text-anchor="middle" style="font-size:9px">MCU</text>
+          <text x="32" y="87" class="label" text-anchor="middle" style="font-size:9px">GPIO</text>
+          <!-- Base resistor -->
+          <line x1="54" y1="74" x2="72" y2="74" class="wire"/>
+          <rect x="72" y="68" width="22" height="12" rx="2" class="component-fill"/>
+          <text x="83" y="78" class="label-orange" text-anchor="middle" style="font-size:9px">R</text>
+          <line x1="94" y1="74" x2="108" y2="74" class="wire"/>
+          <!-- BJT Q1 -->
+          <rect x="108" y="58" width="28" height="36" rx="3" class="component-fill"/>
+          <text x="122" y="79" class="label-orange" text-anchor="middle" style="font-size:10px">Q1</text>
+          <!-- Collector wire up -->
+          <line x1="122" y1="58" x2="122" y2="30" class="wire"/>
+          <circle cx="122" cy="30" r="3" class="node"/>
+          <!-- Relay coil -->
+          <path d="M122,30 L150,30" class="wire"/>
+          <!-- Relay coil inductor symbol -->
+          <path d="M150,30 C154,30 154,20 158,20 C162,20 162,40 166,40 C170,40 170,20 174,20 C178,20 178,40 182,40 C186,40 186,20 190,20 C194,20 194,30 198,30" class="component-body glow-anim"/>
+          <text x="174" y="14" class="label-orange" text-anchor="middle" style="font-size:9px">繼電器線圈</text>
+          <line x1="198" y1="30" x2="240" y2="30" class="wire"/>
+          <!-- VCC -->
+          <text x="248" y="34" class="label-accent" style="font-size:10px">+12V</text>
+          <!-- Flyback diode across relay coil -->
+          <line x1="220" y1="30" x2="220" y2="94" class="wire"/>
+          <circle cx="220" cy="30" r="3" class="node"/>
+          <!-- Diode (flyback) -->
+          <polygon points="212,75 228,67 228,83" class="component-fill" style="fill:rgba(255,107,53,0.25)"/>
+          <line x1="212" y1="67" x2="212" y2="83" class="component-body"/>
+          <text x="236" y="72" class="label-orange" style="font-size:9px">D1</text>
+          <text x="232" y="82" class="label" style="font-size:8px">保護</text>
+          <!-- Emitter to GND -->
+          <line x1="122" y1="94" x2="122" y2="120" class="wire"/>
+          <line x1="220" y1="94" x2="122" y2="94" class="wire"/>
+          <circle cx="122" cy="94" r="3" class="node"/>
+          <!-- GND -->
+          <line x1="108" y1="120" x2="136" y2="120" class="gnd"/>
+          <line x1="112" y1="126" x2="132" y2="126" class="gnd"/>
+          <line x1="116" y1="132" x2="128" y2="132" class="gnd"/>
+          <!-- Relay contacts (load side) -->
+          <rect x="145" y="145" width="80" height="40" rx="3" style="fill:rgba(0,212,255,0.05); stroke:#1e3a5f; stroke-width:1"/>
+          <text x="185" y="162" class="label" text-anchor="middle" style="font-size:9px">接點（Contacts）</text>
+          <text x="185" y="176" class="label-green" text-anchor="middle" style="font-size:9px">控制 AC 220V 負載</text>
+          <line x1="155" y1="145" x2="155" y2="120" class="wire-thin" style="stroke:#39ff14"/>
+          <line x1="215" y1="145" x2="215" y2="120" class="wire-thin" style="stroke:#39ff14"/>
+          <!-- Surge arrow annotation -->
+          <text x="60" y="25" class="label" style="font-size:9px;fill:#ff4444">⚡ 反電動勢</text>
+          <text x="60" y="36" class="label" style="font-size:9px;fill:#ff4444">由 D1 短路</text>
+        </svg>
+      </div>
+      <div>
+        <div class="formula">V_L = -L × dI/dt<br>Q1 OFF → dI/dt 極大<br>→ 產生高壓突波</div>
+        <p class="principle">
+          <strong>工作原理：</strong><br>
+          繼電器線圈是一個<strong>電感</strong>。MCU GPIO 電壓低無法直接驅動，透過 BJT Q1 放大電流。<br><br>
+          ⚠️ <strong>關鍵問題</strong>：Q1 截止瞬間，線圈電流突然中斷，根據 <strong>V = -L dI/dt</strong>，產生極高的<strong>反電動勢（back-EMF）</strong>，可能達數百伏特，摧毀電晶體。<br><br>
+          ✅ <strong>飛輪二極體 D1</strong>（Flyback Diode）反向並聯於線圈，提供電流續流路徑，箝制電壓突波，保護 Q1。
+        </p>
+        <div style="margin-top:10px">
+          <span class="badge">Back-EMF 保護</span>
+          <span class="badge">IoT 控制</span>
+          <span class="badge">工業自動化</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">危險現象</div>
+        <div class="info-value">反電動勢突波可達數百伏特</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">保護方案</div>
+        <div class="info-value">Flyback Diode（1N4007 等）</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">隔離優點</div>
+        <div class="info-value">低壓 MCU 控制高壓 AC 負載</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 4. TRANSFORMER ===== -->
+<div class="content" id="transformer">
+  <div class="card">
+    <div class="card-title">▶ 變壓器（互感應用）</div>
+    <div class="two-col">
+      <div>
+        <svg viewBox="0 0 320 200">
+          <!-- AC Source -->
+          <circle cx="35" cy="100" r="22" class="component-fill"/>
+          <text x="35" y="96" class="label-accent" text-anchor="middle" style="font-size:9px">AC</text>
+          <text x="35" y="108" class="label-accent" text-anchor="middle" style="font-size:9px">220V</text>
+          <!-- Primary winding left -->
+          <line x1="57" y1="88" x2="80" y2="88" class="wire current-flow"/>
+          <line x1="57" y1="112" x2="80" y2="112" class="wire"/>
+          <!-- Primary coil -->
+          <path d="M80,88 C80,78 90,78 90,88 C90,98 80,98 80,108 C80,118 90,118 90,108" class="component-body glow-anim"/>
+          <path d="M90,88 C90,78 100,78 100,88 C100,98 90,98 90,108 C90,118 100,118 100,108" class="component-body glow-anim"/>
+          <path d="M100,88 C100,78 110,78 110,88 C110,98 100,98 100,108 C100,118 110,118 110,108" class="component-body glow-anim"/>
+          <text x="95" y="68" class="label-orange" text-anchor="middle">N₁</text>
+          <text x="95" y="57" class="label" text-anchor="middle" style="font-size:9px">初級線圈</text>
+          <!-- Iron core -->
+          <rect x="118" y="80" width="10" height="40" rx="2" style="fill:rgba(100,100,200,0.3); stroke:#5566aa; stroke-width:1.5"/>
+          <text x="123" y="130" class="label" text-anchor="middle" style="font-size:8px">鐵芯</text>
+          <!-- Magnetic flux arrows -->
+          <text x="123" y="96" style="fill:#aa88ff; font-size:14px; font-family:monospace;" text-anchor="middle" class="pulse">⇅</text>
+          <!-- Secondary coil -->
+          <path d="M128,88 C128,78 138,78 138,88 C138,98 128,98 128,108 C128,118 138,118 138,108" class="component-body"/>
+          <path d="M138,88 C138,78 148,78 148,88 C148,98 138,98 138,108 C138,118 148,118 148,108" class="component-body"/>
+          <text x="148" y="68" class="label-orange" text-anchor="middle">N₂</text>
+          <text x="148" y="57" class="label" text-anchor="middle" style="font-size:9px">次級線圈</text>
+          <!-- Secondary output wires -->
+          <line x1="148" y1="88" x2="220" y2="88" class="wire pulse"/>
+          <line x1="148" y1="108" x2="220" y2="108" class="wire"/>
+          <!-- Load -->
+          <rect x="220" y="80" width="30" height="36" rx="3" class="component-fill"/>
+          <text x="235" y="102" class="label-orange" text-anchor="middle" style="font-size:10px">負載</text>
+          <!-- Output voltage label -->
+          <text x="270" y="92" class="label-accent" style="font-size:10px">Vout</text>
+          <text x="268" y="104" class="label" style="font-size:8px">12V AC</text>
+          <!-- Bottom return for AC source -->
+          <line x1="35" y1="122" x2="35" y2="150" class="wire"/>
+          <line x1="35" y1="150" x2="80" y2="150" class="wire"/>
+          <line x1="80" y1="112" x2="80" y2="150" class="wire"/>
+          <line x1="148" y1="108" x2="148" y2="150" class="wire"/>
+          <line x1="148" y1="150" x2="250" y2="150" class="wire"/>
+          <line x1="250" y1="116" x2="250" y2="150" class="wire"/>
+          <!-- Formula display -->
+          <text x="160" y="175" class="label-green" text-anchor="middle" style="font-size:10px">V₂/V₁ = N₂/N₁ = 12/220</text>
+          <text x="160" y="188" class="label" text-anchor="middle" style="font-size:9px">匝數比決定電壓變換比</text>
+        </svg>
+      </div>
+      <div>
+        <div class="formula">V₂/V₁ = N₂/N₁<br>I₁/I₂ = N₂/N₁<br>（理想變壓器 P₁ = P₂）</div>
+        <p class="principle">
+          <strong>工作原理：</strong><br>
+          變壓器是<strong>兩個電感的互感耦合</strong>。初級線圈（N₁匝）通入 AC，在鐵芯中產生<strong>交變磁通</strong>。<br><br>
+          根據<strong>法拉第感應定律</strong>，磁通變化在次級線圈（N₂匝）感應出 EMF。電壓比等於<strong>匝數比</strong>，功率守恆（忽略損耗）。<br><br>
+          ✅ 主次級<strong>電氣隔離</strong>，是安全設計的核心。
+        </p>
+        <div style="margin-top:10px">
+          <span class="badge">電氣隔離</span>
+          <span class="badge">電源適配器</span>
+          <span class="badge">音頻匹配</span>
+        </div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-label">核心原理</div>
+        <div class="info-value">法拉第電磁感應定律 + 互感</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">典型應用</div>
+        <div class="info-value">充電器、工業電源、音響輸出</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">重要特性</div>
+        <div class="info-value">僅適用 AC，DC 會燒毀鐵芯</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
