@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Plugins &amp; Skills — Reference Notes</title>
+<style>
+  :root {
+    --bg: #fbfbfa;
+    --card: #ffffff;
+    --ink: #1f2328;
+    --muted: #5c6370;
+    --accent: #b8541f;
+    --line: #e6e6e3;
+    --code-bg: #f3f3f0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+  }
+  header {
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .updated {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 18px;
+  }
+  h2 {
+    font-size: 1.12rem;
+    margin: 0 0 10px;
+    color: var(--accent);
+  }
+  h3 {
+    font-size: 0.98rem;
+    margin: 16px 0 6px;
+  }
+  p { margin: 8px 0; }
+  ul { margin: 8px 0; padding-left: 22px; }
+  li { margin: 5px 0; }
+  code {
+    background: var(--code-bg);
+    border-radius: 5px;
+    padding: 1px 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.88em;
+    word-break: break-word;
+  }
+  strong { font-weight: 650; }
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: #fdf6f1;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+  }
+  .caveat {
+    border-left: 3px solid #c9a227;
+    background: #fcf9ec;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+  }
+  .lead { color: var(--muted); margin-top: 2px; }
+  footer {
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Claude Plugins &amp; Skills — Reference Notes</h1>
+    <div class="updated">Last updated: June 26, 2026</div>
+  </header>
+
+  <section>
+    <h2>The two worlds (the root of all the confusion)</h2>
+    <p><strong>Claude.ai (cloud account)</strong> — reached via <em>any browser</em>
+    (PC/Mac/phone) <em>and</em> the <em>mobile apps</em> (iPad, iPhone, Android). All
+    the same account in the cloud. Anything installed while logged into Claude.ai syncs
+    across every browser and mobile app on that account.</p>
+    <p><strong>Claude Desktop (installed application on one computer)</strong> — the
+    standalone app with Chat / Cowork / Code tabs. Plugins added here are saved
+    <em>locally to that machine</em>. They do <strong>not</strong> sync to your
+    Claude.ai cloud account.</p>
+    <div class="callout">These two worlds are invisible to each other. The word
+    "Claude" gets used for both, which is what makes it confusing.</div>
+  </section>
+
+  <section>
+    <h2>Why a desktop-installed plugin doesn't show up on iPad</h2>
+    <p>Plugin installed on <strong>Claude Desktop</strong> (World 2, local). Question
+    asked from the <strong>iPad app</strong> (World 1, Claude.ai cloud). Different
+    worlds → the plugin simply isn't present in the iPad session. A built-in skill of
+    the same name runs because it's the <em>only</em> one there — not because it "beat"
+    the custom one.</p>
+    <p><strong>To get a plugin onto iPad/web:</strong> install the marketplace + plugin
+    <em>again</em> from within Claude.ai (log in via browser, install there; it then
+    syncs to the iPad app on the same account).</p>
+  </section>
+
+  <section>
+    <h2>Where plugin skills work, once installed in a given world</h2>
+    <ul>
+      <li>Marketplace plugins' <strong>skills</strong> work across all three surfaces
+      <em>of the world they're installed in</em>: chat on web, the Chat tab in Desktop,
+      and Cowork.</li>
+      <li><strong>Hooks and sub-agents run only in Cowork</strong> (grayed out in chat).</li>
+      <li><strong>Local-directory plugins</strong> (installed via terminal CLI
+      <code>/plugin marketplace add /path</code>) work <em>only</em> in the CLI — the
+      desktop UI can't register a local path.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Name conflicts &amp; precedence (the important part)</h2>
+    <p><strong>Plugin skills are namespaced</strong> as
+    <code>plugin-name:skill-name</code>. Because of that, they <strong>cannot truly
+    conflict</strong> with built-ins — they coexist as separate addresses rather than
+    one overriding the other.</p>
+    <p>So on desktop, where both a custom plugin and the built-in exist:</p>
+    <ul>
+      <li>Typing the bare <code>/morning-note</code> → resolves to the
+      <strong>built-in</strong> (default).</li>
+      <li>Typing <code>/&lt;plugin-name&gt;:morning-note</code> → resolves to
+      <strong>the plugin's version</strong>.</li>
+    </ul>
+    <p>It's not a fight the built-in "wins" — it's two different identifiers. The bare
+    name just defaults to the bundled one.</p>
+    <h3>The one case of genuine override</h3>
+    <p>A same-named skill placed in <em>personal</em>
+    (<code>~/.claude/skills/</code>) or <em>project</em> (<code>.claude/skills/</code>)
+    scope <em>does</em> replace the bundled skill for the bare name.</p>
+    <p>Precedence order: <strong>enterprise &gt; personal &gt; project &gt; bundled</strong>.
+    Also: a skill beats an old-style command of the same name.</p>
+  </section>
+
+  <section>
+    <h2>Two reliable levers to always hit your own version</h2>
+    <ul>
+      <li>Invoke the namespaced form: <code>/&lt;plugin-name&gt;:morning-note</code>.</li>
+      <li>Or give the skill a <strong>unique name</strong> (e.g.
+      <code>/morning-brief</code>) so the short form is unambiguous and nothing
+      shadows it.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Quick verification commands</h2>
+    <ul>
+      <li><strong>Desktop app:</strong> Customize → Plugins shows installed plugins and
+      their skills.</li>
+      <li><strong>Terminal CLI:</strong> <code>/plugins</code>, or
+      <code>ls ~/.claude/plugins/</code>.</li>
+      <li><strong><code>/doctor</code></strong> (CLI) shows if skill descriptions are
+      being truncated/dropped.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Caveat to carry forward</h2>
+    <div class="caveat">Most precedence behavior above is documented for
+    <strong>Claude Code</strong> specifically. Whether the web/iPad chat
+    <code>/</code> picker exposes the same <code>plugin:skill</code> namespaced syntax
+    is less clearly documented — so after installing into Claude.ai, check the
+    <code>/</code> menu on iPad to confirm the namespaced entry actually appears.</div>
+  </section>
+
+  <footer>Personal reference note · render-safe, no external dependencies</footer>
+
+</div>
+</body>
+</html>
