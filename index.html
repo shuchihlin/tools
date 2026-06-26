@@ -8,167 +8,86 @@
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=IBM+Plex+Mono:wght@400;600&display=swap');
 
   :root {
-    --bg: #080c10;
-    --panel: #0e1520;
-    --border: #1a2a3a;
-    --accent: #38bdf8;
-    --accent2: #4ade80;
-    --accent3: #c084fc;
-    --accent4: #facc15;
-    --text: #c8d8e8;
-    --text-dim: #3a5a70;
+    --bg: #080c10; --panel: #0e1520; --border: #1a2a3a;
+    --accent: #38bdf8; --text: #c8d8e8; --text-dim: #3a5a70;
     --glow: rgba(56,189,248,0.2);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Noto Sans TC', sans-serif;
-    min-height: 100vh;
-    padding: 30px 20px;
+    background: var(--bg); color: var(--text);
+    font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; padding: 30px 20px;
     background-image:
       radial-gradient(ellipse at 20% 10%, rgba(30,60,120,0.15) 0%, transparent 55%),
       radial-gradient(ellipse at 80% 90%, rgba(80,30,120,0.08) 0%, transparent 55%);
   }
 
-  header {
-    text-align: center;
-    margin-bottom: 36px;
-  }
+  header { text-align: center; margin-bottom: 36px; }
 
   h1 {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 1.5rem;
-    color: var(--accent);
-    letter-spacing: 4px;
-    text-shadow: 0 0 24px var(--glow);
-    margin-bottom: 6px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; color: var(--accent);
+    letter-spacing: 4px; text-shadow: 0 0 24px var(--glow); margin-bottom: 6px;
   }
 
-  .tagline {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    letter-spacing: 3px;
-  }
+  .tagline { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-dim); letter-spacing: 3px; }
 
   .divider {
-    width: 60px;
-    height: 1px;
+    width: 60px; height: 1px;
     background: linear-gradient(to right, transparent, var(--accent), transparent);
     margin: 16px auto;
   }
 
   .section-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    letter-spacing: 3px;
-    margin-bottom: 14px;
-    padding-left: 4px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+    color: var(--text-dim); letter-spacing: 3px; margin-bottom: 14px; padding-left: 4px;
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 14px;
-    margin-bottom: 30px;
-  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-bottom: 30px; }
 
   .card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 18px 20px;
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+    padding: 18px 20px; text-decoration: none; color: inherit; display: block;
+    transition: all 0.2s; position: relative; overflow: hidden;
   }
 
   .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--card-color, var(--accent));
-    opacity: 0.6;
-    transition: opacity 0.2s;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--card-color, var(--accent)); opacity: 0.6; transition: opacity 0.2s;
   }
 
-  .card:hover {
-    border-color: var(--card-color, var(--accent));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(0,0,0,0.4);
-  }
-
+  .card:hover { border-color: var(--card-color, var(--accent)); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
   .card:hover::before { opacity: 1; }
 
-  .card-icon {
-    font-size: 1.6rem;
-    margin-bottom: 10px;
-  }
+  .card-icon { font-size: 1.6rem; margin-bottom: 10px; }
 
   .card-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.88rem;
-    color: var(--card-color, var(--accent));
-    margin-bottom: 6px;
-    letter-spacing: 1px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.88rem;
+    color: var(--card-color, var(--accent)); margin-bottom: 6px; letter-spacing: 1px;
   }
 
-  .card-desc {
-    font-size: 0.78rem;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
+  .card-desc { font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; }
 
-  .card-tags {
-    margin-top: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
+  .card-tags { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 4px; }
 
   .tag {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--card-color, var(--accent));
-    border: 1px solid;
-    border-color: var(--card-color, var(--accent));
-    padding: 1px 6px;
-    border-radius: 2px;
-    opacity: 0.6;
-    letter-spacing: 1px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+    color: var(--card-color, var(--accent)); border: 1px solid;
+    border-color: var(--card-color, var(--accent)); padding: 1px 6px;
+    border-radius: 2px; opacity: 0.6; letter-spacing: 1px;
   }
 
   .arrow {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--card-color, var(--accent));
-    opacity: 0.4;
-    transition: opacity 0.2s, transform 0.2s;
+    position: absolute; bottom: 16px; right: 16px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+    color: var(--card-color, var(--accent)); opacity: 0.4; transition: opacity 0.2s, transform 0.2s;
   }
 
-  .card:hover .arrow {
-    opacity: 1;
-    transform: translateX(3px);
-  }
+  .card:hover .arrow { opacity: 1; transform: translateX(3px); }
 
   footer {
-    text-align: center;
-    margin-top: 40px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--text-dim);
-    letter-spacing: 2px;
+    text-align: center; margin-top: 40px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem; color: var(--text-dim); letter-spacing: 2px;
   }
 </style>
 </head>
@@ -180,6 +99,25 @@
   <div class="divider"></div>
 </header>
 
+<!-- Claude Reference -->
+<div class="section-title">// CLAUDE REFERENCE</div>
+<div class="grid">
+
+  <a class="card" href="claude-plugins-skills-reference.html" style="--card-color: #fb923c">
+    <div class="card-icon">🟠</div>
+    <div class="card-title">Plugins &amp; Skills Reference</div>
+    <div class="card-desc">Two-world model, plugin scoping, skill precedence, name conflicts &amp; reliable invocation patterns</div>
+    <div class="card-tags">
+      <span class="tag">Plugins</span>
+      <span class="tag">Skills</span>
+      <span class="tag">Desktop</span>
+      <span class="tag">Claude.ai</span>
+    </div>
+    <div class="arrow">→</div>
+  </a>
+
+</div>
+
 <!-- Electronics Reference -->
 <div class="section-title">// ELECTRONICS REFERENCE</div>
 <div class="grid">
@@ -189,10 +127,8 @@
     <div class="card-title">電感元件應用電路</div>
     <div class="card-desc">升壓電路、LC 濾波器、繼電器驅動、變壓器原理與電路圖</div>
     <div class="card-tags">
-      <span class="tag">Boost</span>
-      <span class="tag">Filter</span>
-      <span class="tag">Relay</span>
-      <span class="tag">Transformer</span>
+      <span class="tag">Boost</span><span class="tag">Filter</span>
+      <span class="tag">Relay</span><span class="tag">Transformer</span>
     </div>
     <div class="arrow">→</div>
   </a>
@@ -202,10 +138,8 @@
     <div class="card-title">電容元件應用電路</div>
     <div class="card-desc">去耦電容、RC 定時、交流耦合、整流濾波原理與電路圖</div>
     <div class="card-tags">
-      <span class="tag">Decoupling</span>
-      <span class="tag">RC Timer</span>
-      <span class="tag">AC Coupling</span>
-      <span class="tag">Rectifier</span>
+      <span class="tag">Decoupling</span><span class="tag">RC Timer</span>
+      <span class="tag">AC Coupling</span><span class="tag">Rectifier</span>
     </div>
     <div class="arrow">→</div>
   </a>
@@ -215,17 +149,13 @@
     <div class="card-title">電阻元件應用電路</div>
     <div class="card-desc">分壓電路、LED 限流、上拉/下拉、運算放大器增益設定</div>
     <div class="card-tags">
-      <span class="tag">Divider</span>
-      <span class="tag">LED</span>
-      <span class="tag">Pull-up</span>
-      <span class="tag">Op-Amp</span>
+      <span class="tag">Divider</span><span class="tag">LED</span>
+      <span class="tag">Pull-up</span><span class="tag">Op-Amp</span>
     </div>
     <div class="arrow">→</div>
   </a>
 
 </div>
-
-<!-- Add more sections here as you build more tools -->
 
 <footer>UPDATED 2026 · BUILT WITH CLAUDE</footer>
 
