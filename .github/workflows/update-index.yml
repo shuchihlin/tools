@@ -1,0 +1,193 @@
+name: Update Index
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.html'
+      - '!index.html'
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rebuild index.html
+        run: |
+          python3 - <<'EOF'
+          import os, re
+
+          # ── section config ─────────────────────────────────────────────────
+          # Files not belonging to a known section go to "OTHER TOOLS"
+          SECTIONS = {
+            "claude": {
+              "label": "// CLAUDE REFERENCE",
+              "color": "#fb923c",
+              "files": [],
+            },
+            "electronics": {
+              "label": "// ELECTRONICS REFERENCE",
+              "color": "#38bdf8",
+              "files": [],
+            },
+            "other": {
+              "label": "// OTHER TOOLS",
+              "color": "#facc15",
+              "files": [],
+            },
+          }
+
+          KEYWORDS = {
+            "claude":       ["claude"],
+            "electronics":  ["inductor", "capacitor", "resistor", "circuit"],
+          }
+
+          SKIP = {"index.html"}
+
+          def classify(filename):
+              fn = filename.lower()
+              for section, kws in KEYWORDS.items():
+                  if any(k in fn for k in kws):
+                      return section
+              return "other"
+
+          def extract_meta(filepath):
+              """Pull <title> and first <meta name=description> from file."""
+              try:
+                  with open(filepath, encoding="utf-8") as f:
+                      html = f.read(8000)
+              except Exception:
+                  return None, None
+              title = re.search(r'<title[^>]*>(.*?)</title>', html, re.I | re.S)
+              desc  = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']', html, re.I)
+              return (title.group(1).strip() if title else None,
+                      desc.group(1).strip()  if desc  else None)
+
+          # ── collect html files ─────────────────────────────────────────────
+          for fn in sorted(os.listdir(".")):
+              if fn.endswith(".html") and fn not in SKIP:
+                  title, desc = extract_meta(fn)
+                  SECTIONS[classify(fn)]["files"].append({
+                      "filename": fn,
+                      "title":    title or fn.replace("-", " ").replace(".html", "").title(),
+                      "desc":     desc  or "",
+                  })
+
+          # ── render cards ───────────────────────────────────────────────────
+          ICONS = {"claude": "🟠", "electronics": "🔵", "other": "🟡"}
+
+          def render_section(key, cfg):
+              if not cfg["files"]:
+                  return ""
+              color = cfg["color"]
+              icon  = ICONS.get(key, "⚪")
+              cards = ""
+              for f in cfg["files"]:
+                  fn    = f["filename"]
+                  title = f["title"]
+                  desc  = f["desc"]
+                  # derive tags from filename words
+                  words = [w.capitalize() for w in re.split(r'[-_]', fn.replace(".html","")) if len(w) > 2][:4]
+                  tags  = "".join(f'<span class="tag">{w}</span>' for w in words)
+                  cards += f"""
+            <a class="card" href="{fn}" style="--card-color: {color}">
+              <div class="card-icon">{icon}</div>
+              <div class="card-title">{title}</div>
+              <div class="card-desc">{desc}</div>
+              <div class="card-tags">{tags}</div>
+              <div class="arrow">→</div>
+            </a>
+          """
+              return f"""
+          <!-- {cfg['label']} -->
+          <div class="section-title">{cfg['label']}</div>
+          <div class="grid">{cards}</div>
+          """
+
+          sections_html = "".join(render_section(k, v) for k, v in SECTIONS.items())
+
+          # ── full page ──────────────────────────────────────────────────────
+          page = f"""<!DOCTYPE html>
+          <html lang="zh-TW">
+          <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Tools — shuchihlin</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&family=IBM+Plex+Mono:wght@400;600&display=swap');
+            :root {{
+              --bg: #080c10; --panel: #0e1520; --border: #1a2a3a;
+              --accent: #38bdf8; --text: #c8d8e8; --text-dim: #3a5a70;
+              --glow: rgba(56,189,248,0.2);
+            }}
+            * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+            body {{ background: var(--bg); color: var(--text);
+              font-family: 'Noto Sans TC', sans-serif; min-height: 100vh; padding: 30px 20px;
+              background-image:
+                radial-gradient(ellipse at 20% 10%, rgba(30,60,120,0.15) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 90%, rgba(80,30,120,0.08) 0%, transparent 55%); }}
+            header {{ text-align: center; margin-bottom: 36px; }}
+            h1 {{ font-family: 'IBM Plex Mono', monospace; font-size: 1.5rem; color: var(--accent);
+              letter-spacing: 4px; text-shadow: 0 0 24px var(--glow); margin-bottom: 6px; }}
+            .tagline {{ font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+              color: var(--text-dim); letter-spacing: 3px; }}
+            .divider {{ width: 60px; height: 1px;
+              background: linear-gradient(to right, transparent, var(--accent), transparent);
+              margin: 16px auto; }}
+            .section-title {{ font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+              color: var(--text-dim); letter-spacing: 3px; margin-bottom: 14px; padding-left: 4px; }}
+            .grid {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+              gap: 14px; margin-bottom: 30px; }}
+            .card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+              padding: 18px 20px; text-decoration: none; color: inherit; display: block;
+              transition: all 0.2s; position: relative; overflow: hidden; }}
+            .card::before {{ content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+              background: var(--card-color, var(--accent)); opacity: 0.6; transition: opacity 0.2s; }}
+            .card:hover {{ border-color: var(--card-color, var(--accent)); transform: translateY(-2px);
+              box-shadow: 0 6px 24px rgba(0,0,0,0.4); }}
+            .card:hover::before {{ opacity: 1; }}
+            .card-icon {{ font-size: 1.6rem; margin-bottom: 10px; }}
+            .card-title {{ font-family: 'IBM Plex Mono', monospace; font-size: 0.88rem;
+              color: var(--card-color, var(--accent)); margin-bottom: 6px; letter-spacing: 1px; }}
+            .card-desc {{ font-size: 0.78rem; color: var(--text-dim); line-height: 1.6; }}
+            .card-tags {{ margin-top: 12px; display: flex; flex-wrap: wrap; gap: 4px; }}
+            .tag {{ font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem;
+              color: var(--card-color, var(--accent)); border: 1px solid;
+              border-color: var(--card-color, var(--accent)); padding: 1px 6px;
+              border-radius: 2px; opacity: 0.6; letter-spacing: 1px; }}
+            .arrow {{ position: absolute; bottom: 16px; right: 16px;
+              font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;
+              color: var(--card-color, var(--accent)); opacity: 0.4; transition: opacity 0.2s, transform 0.2s; }}
+            .card:hover .arrow {{ opacity: 1; transform: translateX(3px); }}
+            footer {{ text-align: center; margin-top: 40px; font-family: 'IBM Plex Mono', monospace;
+              font-size: 0.65rem; color: var(--text-dim); letter-spacing: 2px; }}
+          </style>
+          </head>
+          <body>
+          <header>
+            <h1>TOOLS</h1>
+            <div class="tagline">shuchihlin.github.io/tools</div>
+            <div class="divider"></div>
+          </header>
+          {sections_html}
+          <footer>UPDATED 2026 · BUILT WITH CLAUDE</footer>
+          </body>
+          </html>"""
+
+          with open("index.html", "w", encoding="utf-8") as f:
+              f.write(page)
+
+          print("index.html updated.")
+          EOF
+
+      - name: Commit updated index
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "chore: auto-update index [skip ci]"
+          git push
