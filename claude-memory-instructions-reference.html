@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Memory & Instructions — Reference Notes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #080c10;
+    --panel: #0e1520;
+    --border: #1a2a3a;
+    --accent: #fb923c;
+    --accent2: #38bdf8;
+    --accent3: #4ade80;
+    --text: #c8d8e8;
+    --text-dim: #5a7a90;
+    --glow: rgba(251,146,60,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+    max-width: 860px;
+    margin: 0 auto;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(251,146,60,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 90%, rgba(56,189,248,0.04) 0%, transparent 55%);
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.3rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-shadow: 0 0 32px var(--glow);
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  .updated {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--text-dim);
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin: 36px 0 16px 0;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 6px 6px 0 0;
+    background: var(--stripe, var(--accent));
+  }
+
+  .card-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--stripe, var(--accent));
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .card p {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .card p:last-child { margin-bottom: 0; }
+
+  .card ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0;
+  }
+
+  .card ul li {
+    font-size: 0.84rem;
+    line-height: 1.7;
+    color: var(--text);
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 4px;
+  }
+
+  .card ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--stripe, var(--accent));
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  .path {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent2);
+    background: rgba(56,189,248,0.06);
+    border: 1px solid rgba(56,189,248,0.15);
+    border-radius: 3px;
+    padding: 2px 7px;
+    display: inline-block;
+    margin: 2px 0;
+  }
+
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .compare { grid-template-columns: 1fr; }
+  }
+
+  .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    border: 1px solid;
+    padding: 1px 6px;
+    border-radius: 2px;
+    opacity: 0.7;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-right: 4px;
+  }
+
+  .warn {
+    background: rgba(251,146,60,0.06);
+    border-color: rgba(251,146,60,0.2);
+  }
+
+  .warn .card-label { color: var(--accent); }
+
+  footer {
+    text-align: center;
+    margin-top: 56px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CLAUDE MEMORY &amp; INSTRUCTIONS</h1>
+  <div class="subtitle">Reference Notes — How Claude Knows What It Knows About You</div>
+  <div class="updated">Last updated: June 26, 2026</div>
+</header>
+
+<!-- THE TWO SYSTEMS -->
+<h2>// THE TWO SEPARATE SYSTEMS</h2>
+
+<div class="compare">
+
+  <div class="card" style="--stripe: #fb923c">
+    <div class="card-label">INSTRUCTIONS FOR CLAUDE</div>
+    <p>Explicit rules and preferences you type into a settings field. Claude reads these at the start of every session.</p>
+    <ul>
+      <li>Manually written by you</li>
+      <li>Persistent across sessions</li>
+      <li>Revealed by: <span class="path">"what are my instructions?"</span></li>
+    </ul>
+  </div>
+
+  <div class="card" style="--stripe: #38bdf8">
+    <div class="card-label">CLAUDE'S MEMORY</div>
+    <p>Facts Claude inferred and saved from past conversations — without you explicitly writing them down.</p>
+    <ul>
+      <li>Auto-generated from chat history</li>
+      <li>Persistent across sessions</li>
+      <li>Revealed by: <span class="path">"what do you know about me?"</span></li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="card warn">
+  <div class="card-label">⚠ KEY DISTINCTION</div>
+  <p>These two systems are independent. Asking "what are my instructions?" does NOT reveal memory, and "what do you know about me?" does NOT reveal instructions. You need both queries to get the full picture of what Claude carries into a session.</p>
+</div>
+
+
+<!-- WHERE TO FIND AND EDIT EACH -->
+<h2>// WHERE TO FIND AND EDIT EACH</h2>
+
+<div class="card" style="--stripe: #fb923c">
+  <div class="card-label">INSTRUCTIONS FOR CLAUDE — LOCATION</div>
+  <p><strong>Claude Desktop:</strong><br>
+  <span class="path">Settings → General → Instructions for Claude</span></p>
+  <p><strong>Claude.ai (web):</strong><br>
+  <span class="path">https://claude.ai → Settings → General → Instructions for Claude</span></p>
+  <p>Both surfaces show the same field — it syncs with your cloud account. Edit directly in the text box and save.</p>
+</div>
+
+<div class="card" style="--stripe: #38bdf8">
+  <div class="card-label">CLAUDE'S MEMORY — LOCATION</div>
+  <p><strong>Claude.ai (web):</strong><br>
+  <span class="path">https://claude.ai → Settings → Privacy → Memory</span></p>
+  <p>You can view all stored memory entries, edit individual facts, or delete them. Claude Desktop does not expose a memory management UI — use the web interface.</p>
+</div>
+
+
+<!-- WHAT DOES NOT WORK -->
+<h2>// WHAT DOES NOT WORK FOR PERSISTENT INSTRUCTIONS</h2>
+
+<div class="card" style="--stripe: #f87171">
+  <div class="card-label">LOCAL CLAUDE.MD FILES</div>
+  <p>It is tempting to edit markdown files on disk to set persistent preferences. The results are inconsistent:</p>
+  <ul>
+    <li><span class="path">C:\Users\master\.claude\CLAUDE.md</span> — read by Claude Code CLI only, not by Cowork</li>
+    <li><span class="path">C:\Users\master\Claude\.claude\CLAUDE.md</span> — does not exist by default</li>
+    <li>Session-specific CLAUDE.md paths shown in system context — these are virtual references; the files do not exist on disk</li>
+  </ul>
+  <p>For Cowork, use the <strong>Settings UI</strong>, not local files.</p>
+</div>
+
+
+<!-- WEB FETCH VS BROWSER -->
+<h2>// WHY CLAUDE'S WEB FETCH CAN DIFFER FROM YOUR BROWSER</h2>
+
+<div class="card" style="--stripe: #a78bfa">
+  <div class="card-label">REMOTE SANDBOX, NOT YOUR PC</div>
+  <p>When Claude fetches a URL, the request originates from a <strong>remote Linux sandbox</strong> in a cloud data center — not from your local machine. This means:</p>
+  <ul>
+    <li>Different geographic location → different CDN edge node</li>
+    <li>Different cache state → may serve stale content your browser has already refreshed</li>
+    <li>Not a bug — expected behavior given the architecture</li>
+  </ul>
+  <p>If Claude reports outdated content for a URL you can see is current in your browser, this is the reason.</p>
+</div>
+
+
+<footer>PERSONAL REFERENCE NOTE · BUILT WITH CLAUDE · RENDER-SAFE, NO EXTERNAL DEPENDENCIES</footer>
+
+</body>
+</html>
