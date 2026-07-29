@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kimi K3 Evaluation &amp; LLM Fundamentals — Session Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1c2733;
+    --ink-soft:#44546a;
+    --paper:#fafbfc;
+    --panel:#ffffff;
+    --line:#d8dee6;
+    --signal:#0b5fa5;      /* signal-trace blue */
+    --signal-soft:#e8f1f9;
+    --verified:#1a7f4b;
+    --verified-soft:#e7f4ec;
+    --claim:#a06210;
+    --claim-soft:#faf1e2;
+    --mono:'IBM Plex Mono', ui-monospace, monospace;
+    --sans:'IBM Plex Sans', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+  body{
+    font-family:var(--sans);
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.65;
+    font-size:16px;
+  }
+  .wrap{max-width:860px;margin:0 auto;padding:0 20px 80px}
+
+  /* Datasheet header */
+  header{
+    border-bottom:3px solid var(--ink);
+    padding:36px 0 20px;
+    margin-bottom:8px;
+  }
+  .doc-id{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:14px;
+  }
+  h1{
+    font-size:clamp(26px,5vw,38px);
+    font-weight:700;
+    line-height:1.15;
+    letter-spacing:-.01em;
+  }
+  h1 .sub{
+    display:block;
+    font-size:clamp(15px,2.6vw,18px);
+    font-weight:500;
+    color:var(--signal);
+    font-family:var(--mono);
+    margin-top:8px;
+    letter-spacing:0;
+  }
+
+  /* Spec strip */
+  .spec-strip{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    border:1px solid var(--line);
+    border-top:none;
+    background:var(--panel);
+    margin-bottom:44px;
+  }
+  .spec-cell{
+    padding:14px 16px;
+    border-right:1px solid var(--line);
+    border-top:1px solid var(--line);
+  }
+  .spec-cell:last-child{border-right:none}
+  .spec-cell .k{
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--ink-soft);
+  }
+  .spec-cell .v{
+    font-family:var(--mono);
+    font-size:17px;
+    font-weight:600;
+    color:var(--ink);
+    margin-top:2px;
+  }
+  .spec-cell .v small{font-size:12px;font-weight:400;color:var(--ink-soft)}
+
+  /* Sections */
+  section{margin-bottom:52px}
+  .part-label{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--signal);
+    border-bottom:1px solid var(--line);
+    padding-bottom:6px;
+    margin-bottom:18px;
+  }
+  h2{
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:16px;
+    letter-spacing:-.01em;
+  }
+  h3{
+    font-size:17px;
+    font-weight:600;
+    margin:28px 0 10px;
+  }
+  p{margin-bottom:12px;color:var(--ink)}
+  p.note{color:var(--ink-soft);font-size:14.5px}
+  ul{margin:0 0 14px 22px}
+  li{margin-bottom:6px}
+  strong{font-weight:600}
+  code,.mono{font-family:var(--mono);font-size:.92em}
+  code{background:var(--signal-soft);padding:1px 5px;border-radius:3px}
+
+  /* Formula block — signature element */
+  .formula{
+    font-family:var(--mono);
+    font-size:clamp(18px,4vw,24px);
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:4px solid var(--signal);
+    padding:18px 22px;
+    margin:18px 0;
+  }
+  .formula .legend{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-top:10px;
+    line-height:1.7;
+  }
+  .formula .legend b{color:var(--signal);font-weight:600}
+
+  /* Tables */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0 20px;
+    background:var(--panel);
+    font-size:14.5px;
+  }
+  th{
+    font-family:var(--mono);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    text-align:left;
+    color:var(--ink-soft);
+    border-bottom:2px solid var(--ink);
+    padding:8px 12px;
+  }
+  td{
+    border-bottom:1px solid var(--line);
+    padding:9px 12px;
+    vertical-align:top;
+  }
+  td.num{font-family:var(--mono);white-space:nowrap}
+
+  /* Verified vs claim tags */
+  .tag{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.06em;
+    padding:2px 8px;
+    border-radius:3px;
+    text-transform:uppercase;
+    vertical-align:middle;
+  }
+  .tag.ok{background:var(--verified-soft);color:var(--verified)}
+  .tag.warn{background:var(--claim-soft);color:var(--claim)}
+
+  .callout{
+    background:var(--panel);
+    border:1px solid var(--line);
+    padding:16px 20px;
+    margin:16px 0;
+  }
+  .callout.verdict{border-left:4px solid var(--ink)}
+  .callout.cn{
+    border-left:4px solid var(--signal);
+    font-size:16.5px;
+    line-height:1.9;
+  }
+  .callout .label{
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+
+  /* Analogy rows */
+  .analogy{
+    display:grid;
+    grid-template-columns:170px 1fr;
+    gap:0;
+    border:1px solid var(--line);
+    background:var(--panel);
+    margin:14px 0 20px;
+    font-size:14.5px;
+  }
+  .analogy > div{padding:10px 14px;border-bottom:1px solid var(--line)}
+  .analogy > div:nth-last-child(-n+2){border-bottom:none}
+  .analogy .a{
+    font-family:var(--mono);
+    font-weight:600;
+    color:var(--signal);
+    border-right:1px solid var(--line);
+    font-size:13px;
+  }
+  @media(max-width:560px){
+    .analogy{grid-template-columns:1fr}
+    .analogy .a{border-right:none;border-bottom:none;padding-bottom:2px}
+    .analogy .b{padding-top:2px}
+  }
+
+  footer{
+    border-top:1px solid var(--line);
+    padding-top:20px;
+    font-family:var(--mono);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    line-height:2;
+  }
+  footer a{color:var(--signal);text-decoration:none}
+  footer a:hover,footer a:focus{text-decoration:underline}
+  a:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="doc-id">
+    <span>REF: LLM-NOTES-001</span>
+    <span>REV 2026-07-28</span>
+  </div>
+  <h1>Kimi K3 Evaluation &amp; LLM Fundamentals
+    <span class="sub">// session notes · compiled with Claude</span>
+  </h1>
+</header>
+
+<div class="spec-strip">
+  <div class="spec-cell"><div class="k">Parameters</div><div class="v">2.8T <small>MoE 16/896</small></div></div>
+  <div class="spec-cell"><div class="k">Weights on disk</div><div class="v">1.56 TB <small>MXFP4</small></div></div>
+  <div class="spec-cell"><div class="k">Context</div><div class="v">1M <small>tokens</small></div></div>
+  <div class="spec-cell"><div class="k">API price</div><div class="v">$3 / $15 <small>per M tok</small></div></div>
+  <div class="spec-cell"><div class="k">AA Index</div><div class="v">57 <small>#4 / 189</small></div></div>
+</div>
+
+<!-- ============ PART 1 ============ -->
+<section>
+  <div class="part-label">Part 1 / Kimi K3 (Moonshot AI)</div>
+  <h2>Model evaluation</h2>
+
+  <h3>Key facts</h3>
+  <ul>
+    <li>Released 2026-07-16 (API); open weights released 2026-07-27</li>
+    <li>2.8T parameters, Mixture-of-Experts: 896 experts, 16 active per token (~4% utilization per forward pass)</li>
+    <li>1M-token context window; native text / image / video input</li>
+    <li>Largest open-weight model to date; weights ship as 96 safetensors shards, ~1.56 TB total</li>
+    <li>Native MXFP4 (4-bit) weights via quantization-aware training — 4-bit <em>is</em> its native precision, no post-hoc compression loss</li>
+  </ul>
+
+  <h3>Pricing</h3>
+  <ul>
+    <li>$3 / $15 per million input / output tokens; cached input $0.30</li>
+    <li>Claude Sonnet-tier pricing; most expensive Chinese-lab model to date (predecessor K2.6: $0.95 / $4)</li>
+  </ul>
+
+  <h3>Benchmarks — verified vs vendor-claimed</h3>
+
+  <p><span class="tag ok">Independently verified</span></p>
+  <table>
+    <tr><th>Result</th><th>Value</th><th>Source</th></tr>
+    <tr>
+      <td>Artificial Analysis Intelligence Index v4.1</td>
+      <td class="num">57 · #4 / 189</td>
+      <td>AA — same harness &amp; settings for all models. Effectively #3 model family; #1 open-weight. Trails Fable&nbsp;5 w/ Opus fallback (~59.9), GPT-5.6 Sol Max (~58.9). Median among peers ≈ 25.</td>
+    </tr>
+    <tr>
+      <td>Arena frontend-code leaderboard</td>
+      <td class="num">#1 · 1679 Elo</td>
+      <td>Blind human voting; above Fable&nbsp;5's 1631</td>
+    </tr>
+  </table>
+
+  <p><span class="tag warn">Vendor-only — not reproduced</span></p>
+  <ul>
+    <li>Terminal-Bench 2.1 (88.3), DeepSWE, BrowseComp, AutomationBench, SpreadsheetBench</li>
+    <li><strong>Harness caveat:</strong> Moonshot's table mixes KimiCode / Claude Code / Codex / mini-SWE-agent harnesses; harness choice can swing scores 10–26 points — not apples-to-apples</li>
+  </ul>
+
+  <p><strong>Independent negatives:</strong> AA measures K3 as notably slow, very verbose (inflates real cost beyond sticker price), and expensive vs other open-weight models. Per-task cost ≈ $0.94 vs $1.04 for GPT-5.6 Sol Max — cost advantage marginal.</p>
+
+  <div class="callout verdict">
+    <div class="label">Verdict</div>
+    First open-weight model within ~3 points of the closed frontier. But the price advantage is thin, self-hosting needs a multi-GPU cluster (impractical for individuals), and most agentic wins remain vendor-reported. Best fit: inference providers, enterprises needing open weights, data sovereignty, or 1M context.
+  </div>
+
+  <p class="note"><strong>On the evaluator:</strong> Artificial Analysis (artificialanalysis.ai) is an independent commercial benchmarking firm. Vendor-neutral and widely cited, but not a standards body — the best available independent signal, not an audit.</p>
+</section>
+
+<!-- ============ PART 2 ============ -->
+<section>
+  <div class="part-label">Part 2 / LLM Fundamentals</div>
+  <h2>The paradigm shift from traditional software</h2>
+
+  <table>
+    <tr><th></th><th>Traditional software</th><th>LLM</th></tr>
+    <tr><td><strong>Behavior lives in</strong></td><td>Explicit code (if/else, human-written logic)</td><td>Weights (learned numbers)</td></tr>
+    <tr><td><strong>Size of "code"</strong></td><td>Millions of lines</td><td>~Thousands of lines (generic plumbing)</td></tr>
+    <tr><td><strong>Fixable by</strong></td><td>Editing a line</td><td>Fine-tuning all weights (probabilistic)</td></tr>
+    <tr><td><strong>Deterministic?</strong></td><td>Yes</td><td>No — statistical dispositions</td></tr>
+    <tr><td><strong>Interpretable?</strong></td><td>Yes</td><td>Open research problem</td></tr>
+  </table>
+
+  <h3>The core equation</h3>
+  <div class="formula">
+    y = W·x + b
+    <div class="legend">
+      <b>W, b</b> — weights / parameters: the learned numbers baked into the model file. Identical for every request. This is the 1.56 TB.<br>
+      <b>x</b> — input / activation: the transient signal flowing through (your prompt as vectors, then each layer's output). Never stored in the model.<br>
+      <b>y</b> — output, which becomes the next layer's x.<br>
+      Adaptive-filter analogy: W = converged coefficients, x = input signal. Nobody calls the signal a parameter of the filter.
+    </div>
+  </div>
+
+  <h3>Core vocabulary</h3>
+  <ul>
+    <li><strong>Parameter = weight</strong> (interchangeable in practice). Each is one learnable number. "2.8T parameters" counts everything gradient descent adjusts: W matrices, biases, embeddings, norm scales — all shipped in the release. Biases are ~4 orders of magnitude fewer than W per layer; many modern architectures omit them entirely.</li>
+    <li><strong>Corpus (語料庫):</strong> trillions of tokens of training text — the "signal source" that drove weight convergence. Weights ≈ lossy compression of corpus regularities; hallucination = compression artifact. Data quality &amp; mix often matter more than architecture — the top trade secret.</li>
+    <li><strong>File size formula:</strong> <code>size ≈ params × bits ÷ 8</code>. K3: 2.8T × 4 ÷ 8 = 1.4 TB + scaling factors ≈ 1.56 TB. Works in reverse: file size ÷ param count reveals any model's quantization precision.</li>
+  </ul>
+
+  <h3>Architecture vs weights</h3>
+  <ul>
+    <li><strong>Architecture (code)</strong> dictates <em>what operations</em> run: matmul, attention, MoE routing. Generic; contains zero knowledge. K3's and GPT's are structurally similar.</li>
+    <li><strong>Weights</strong> dictate <em>what those operations compute</em>: all knowledge, capability, "personality." Same code + different weights = different product — exactly what fine-tuning produces.</li>
+    <li><strong>Behavior ≠ logic.</strong> No rules exist anywhere inside. Weights encode statistical dispositions; apparent reasoning is emergent from billions of multiply-adds. Consequences: no patching, no determinism guarantees, interpretability unsolved.</li>
+  </ul>
+
+  <h3>The three codebases of an LLM</h3>
+  <table>
+    <tr><th>#</th><th>Codebase</th><th>Released?</th><th>Contents</th></tr>
+    <tr>
+      <td class="num">1</td>
+      <td><strong>Inference / architecture</strong></td>
+      <td><span class="tag ok">Released</span></td>
+      <td>Few thousand lines of PyTorch: layers, attention, routing, config, tokenizer. Required to make weights usable.</td>
+    </tr>
+    <tr>
+      <td class="num">2</td>
+      <td><strong>Training</strong></td>
+      <td><span class="tag warn">Closed</span></td>
+      <td>Distributed orchestration, RL/RLHF infrastructure, hyperparameter schedules. The factory.</td>
+    </tr>
+    <tr>
+      <td class="num">3</td>
+      <td><strong>Data pipeline</strong></td>
+      <td><span class="tag warn">Closed</span></td>
+      <td>Crawling, dedup, filtering, corpus mixing. Arguably the most valuable secret.</td>
+    </tr>
+  </table>
+
+  <h3>Open weights vs open source</h3>
+  <ul>
+    <li><strong>Open weights</strong> = weights + inference code + tokenizer + technical report. Like shipping a compiled binary plus the runtime spec.</li>
+    <li><strong>Open source (OSI-strict)</strong> = all three codebases + data + unrestricted license. Like shipping the full buildable source tree. Rare (e.g., AI2 OLMo).</li>
+    <li>Most "open source" headlines (Llama, DeepSeek, Kimi) are actually open weights with custom licenses. K3's license includes a revenue gate on large commercial resellers — not MIT/Apache.</li>
+  </ul>
+
+  <h3>Why downloaders can operate without training code</h3>
+  <p>Inference never references training. The weights are a finished product — all value produced by codebases #2 and #3 is already baked into the numbers. Running = load weights → execute the architecture's matrix operations.</p>
+  <div class="analogy">
+    <div class="a">FILTER</div><div class="b">To operate a converged adaptive filter you need coefficients + structure — not the adaptation algorithm.</div>
+    <div class="a">SOFTWARE</div><div class="b">To run a binary you need a runtime — not the compiler or build system.</div>
+    <div class="a">HARDWARE</div><div class="b">To use a chip you need the datasheet — not the fab.</div>
+  </div>
+  <p>Fine-tuning still works because open frameworks (PyTorch, HuggingFace PEFT) provide a <em>generic</em> training capability — a substitute compiler — good enough for incremental adjustment, not for trillion-token industrial pretraining.</p>
+
+  <h3>What adopters can and cannot do</h3>
+  <table>
+    <tr><th>Can</th><th>Cannot</th></tr>
+    <tr><td>Self-host (privacy, no API dependency)</td><td>Reproduce the model from scratch</td></tr>
+    <tr><td>Fine-tune / LoRA on own data</td><td>Read or explain why weights behave a certain way</td></tr>
+    <tr><td>Quantize for cheaper hardware</td><td>Verify training data (copyright, bias)</td></tr>
+    <tr><td>Distill into smaller models</td><td>Fix flaws rooted in training data</td></tr>
+    <tr><td>Modify inference (sampling, context tricks)</td><td>Exceed license restrictions</td></tr>
+    <tr><td>Air-gapped deployment</td><td></td></tr>
+  </table>
+
+  <div class="callout cn">
+    <div class="label">一句話總結</div>
+    架構是空的計算機,corpus 是課本,權重是讀完課本後的腦。<br>
+    開源權重 = 給你腦,不給課本,也不給印課本的工廠。
+  </div>
+</section>
+
+<footer>
+  SOURCES (checked 2026-07-28):<br>
+  <a href="https://artificialanalysis.ai/models/kimi-k3">artificialanalysis.ai/models/kimi-k3</a> — independent index &amp; provider benchmarks<br>
+  Moonshot AI launch blog — vendor benchmarks ·
+  <a href="https://simonwillison.net/2026/Jul/16/kimi-k3/">simonwillison.net</a> ·
+  venturebeat.com ·
+  felloai.com/kimi-k3 ·
+  apidog.com · emergent.sh
+</footer>
+
+</div>
+</body>
+</html>
