@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLM Serving Architecture — Session Notes</title>
+<style>
+:root {
+  --bg: #fdfcfa; --fg: #2c2c2a; --fg2: #5f5e5a; --border: #d3d1c7;
+  --code-bg: #f1efe8; --card: #f7f6f2;
+  --teal-f: #E1F5EE; --teal-s: #0F6E56; --teal-t: #085041; --teal-u: #0F6E56;
+  --purple-f: #EEEDFE; --purple-s: #534AB7; --purple-t: #3C3489; --purple-u: #534AB7;
+  --gray-f: #F1EFE8; --gray-s: #5F5E5A; --gray-t: #444441; --gray-u: #5F5E5A;
+  --red-f: #FCEBEB; --red-s: #A32D2D; --red-t: #791F1F; --red-u: #A32D2D;
+  --amber-f: #FAEEDA; --amber-s: #854F0B; --amber-t: #633806; --amber-u: #854F0B;
+  --green-line: #1D9E75; --red-line: #E24B4A;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a18; --fg: #e8e6de; --fg2: #b4b2a9; --border: #444441;
+    --code-bg: #2c2c2a; --card: #232321;
+    --teal-f: #085041; --teal-s: #5DCAA5; --teal-t: #9FE1CB; --teal-u: #5DCAA5;
+    --purple-f: #3C3489; --purple-s: #AFA9EC; --purple-t: #CECBF6; --purple-u: #AFA9EC;
+    --gray-f: #2c2c2a; --gray-s: #B4B2A9; --gray-t: #D3D1C7; --gray-u: #B4B2A9;
+    --red-f: #501313; --red-s: #F09595; --red-t: #F7C1C1; --red-u: #F09595;
+    --amber-f: #412402; --amber-s: #EF9F27; --amber-t: #FAC775; --amber-u: #EF9F27;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 2rem 1rem; background: var(--bg); color: var(--fg);
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 16px; line-height: 1.7;
+}
+main { max-width: 860px; margin: 0 auto; }
+h1 { font-size: 1.7rem; font-weight: 600; margin: 0 0 0.2rem; }
+h2 { font-size: 1.25rem; font-weight: 600; margin: 2.6rem 0 0.8rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+h3 { font-size: 1.05rem; font-weight: 600; margin: 1.6rem 0 0.5rem; }
+.meta { color: var(--fg2); font-size: 0.9rem; margin-bottom: 1.5rem; }
+code, pre { font-family: "SF Mono", Consolas, Menlo, monospace; font-size: 0.86em; }
+code { background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+pre { background: var(--code-bg); padding: 0.9rem 1.1rem; border-radius: 8px; overflow-x: auto; line-height: 1.5; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.92rem; }
+th, td { border: 1px solid var(--border); padding: 0.45rem 0.7rem; text-align: left; vertical-align: top; }
+th { background: var(--card); font-weight: 600; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; margin: 1rem 0; }
+.ok { color: var(--green-line); font-weight: 600; }
+.bad { color: var(--red-line); font-weight: 600; }
+figure { margin: 1.4rem 0; }
+figcaption { color: var(--fg2); font-size: 0.85rem; margin-top: 0.4rem; }
+svg { width: 100%; height: auto; display: block; }
+svg text { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; }
+.sv-h { font-size: 14px; font-weight: 600; }
+.sv-s { font-size: 12px; font-weight: 400; }
+ul, ol { padding-left: 1.4rem; }
+li { margin: 0.3rem 0; }
+a { color: var(--teal-u); }
+footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--fg2); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>How frontier LLMs are deployed and served</h1>
+<p class="meta">Session notes — mapping the legacy 3-tier web deployment model to modern LLM serving. August 2026.</p>
+
+<h2>1. From 3-tier web to LLM serving</h2>
+<p><strong>What stays the same:</strong> the edge. GeoDNS/anycast routing to the nearest POP, TLS termination, API gateway doing auth, rate limiting, and quota. Requests are stateless HTTPS with streaming responses (SSE). Tier 1 is recognizable CDN/gateway territory.</p>
+<p><strong>What changes fundamentally:</strong></p>
+<table>
+<tr><th>3-tier concept</th><th>LLM serving equivalent</th><th>Key difference</th></tr>
+<tr><td>App server (1 box behind a VIP)</td><td>Model <strong>replica</strong> spanning 8–32+ GPUs</td><td>One model doesn't fit in one server; the replica is scheduled as an atomic unit</td></tr>
+<tr><td>Load balancer (round-robin, least-conn)</td><td>Scheduler doing <strong>continuous batching</strong></td><td>Load metric is KV cache occupancy and token queue depth, not CPU or connections</td></tr>
+<tr><td>Sticky session (client IP hash)</td><td><strong>Prefix-cache-aware routing</strong></td><td>Sticky is a performance optimization (cache hits), never a correctness requirement</td></tr>
+<tr><td>Mid-tier / backend DB in the hot path</td><td>None — the transient <strong>KV cache</strong> in GPU HBM</td><td>DBs exist only in the control plane (auth, billing, chat history)</td></tr>
+<tr><td>Session state in replicated memory / shared store</td><td>Session state = the resent conversation text</td><td>The inference API is stateless per turn</td></tr>
+<tr><td>Autoscale by adding VMs in seconds</td><td>Add a replica = 8–32 reserved GPUs + minutes of weight loading</td><td>Capacity is coarse and slow; priority tiers absorb load spikes</td></tr>
+</table>
+<p>Modern deployments also split <strong>prefill</strong> (prompt processing, compute-bound) and <strong>decode</strong> (token generation, memory-bandwidth-bound) into separate GPU pools, shipping the KV cache between them over RDMA.</p>
+
+<h2>2. Replica and KV cache — definitions</h2>
+<div class="card">
+<p style="margin:0.2rem 0"><strong>Replica</strong> = one complete copy of the model <em>weights</em> (hundreds of GB to TBs), loaded into GPU memory across however many GPUs it takes, plus the inference engine running them. Weights are shared, read-only, permanent. 100 replicas = 100 copies of the same weights, each serving its own set of users.</p>
+<p style="margin:0.6rem 0 0.2rem"><strong>KV cache</strong> = per-request scratch memory. As the model processes tokens, each layer's attention keys/values are cached so each new token doesn't recompute them (memoization). Per-request, read-write, transient — created when a request starts, grows one token's worth per generated token, discarded (or briefly kept as a reusable prefix) when the response finishes. Can reach gigabytes for long contexts.</p>
+</div>
+<figure>
+<svg viewBox="0 0 680 220" role="img" aria-label="Replica HBM memory split">
+<rect x="60" y="40" width="560" height="140" rx="14" fill="none" stroke="var(--gray-s)" stroke-width="1"/>
+<text class="sv-h" x="70" y="28" fill="var(--fg)">One replica's aggregate GPU HBM</text>
+<rect x="72" y="56" width="200" height="110" rx="8" fill="var(--purple-f)" stroke="var(--purple-s)" stroke-width="0.5"/>
+<text class="sv-h" x="172" y="100" text-anchor="middle" fill="var(--purple-t)">Weights</text>
+<text class="sv-s" x="172" y="122" text-anchor="middle" fill="var(--purple-u)">Fixed, read-only</text>
+<text class="sv-s" x="172" y="140" text-anchor="middle" fill="var(--purple-u)">~50–60% max</text>
+<rect x="284" y="56" width="324" height="110" rx="8" fill="var(--teal-f)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="446" y="92" text-anchor="middle" fill="var(--teal-t)">KV cache pool</text>
+<text class="sv-s" x="446" y="114" text-anchor="middle" fill="var(--teal-u)">Paged, carved among all concurrent requests</text>
+<text class="sv-s" x="446" y="132" text-anchor="middle" fill="var(--teal-u)">Cache size determines batch size determines throughput</text>
+<text class="sv-s" x="340" y="205" text-anchor="middle" fill="var(--fg2)">Both weights and KV cache are sharded across the same GPUs, in the same tensor-parallel pattern</text>
+</svg>
+<figcaption>Replica memory model: fixed weights, remaining HBM is the shared KV cache pool.</figcaption>
+</figure>
+<p>Rough replica sizing (FP8 weights, H100-class 80&nbsp;GB GPUs): a 70B dense model fits in half to one 8-GPU node; a frontier MoE (~1–2T params) needs 16–32+ GPUs across 2–4 nodes. A 1,024-GPU cluster holds ~128–256 replicas of a 70B model, or ~32–64 replicas of a frontier MoE.</p>
+
+<h2>3. Corrected mental model — the statements, graded</h2>
+<table>
+<tr><th>Statement</th><th></th><th>Correction</th></tr>
+<tr><td>My chat session is served by a replica and generates a KV cache</td><td class="ok">✓</td><td>Correct, per <em>turn</em> — each request generates a cache on whichever replica handles it</td></tr>
+<tr><td>The KV cache is maintained on only one GPU node</td><td class="bad">✗</td><td>The cache is <strong>sharded across the same GPUs as the replica</strong>, co-located with each GPU's slice of the weights</td></tr>
+<tr><td>Each follow-up is served by the same replica, same growing cache</td><td class="bad">✗</td><td>Same replica is <strong>preferred, never guaranteed</strong>. The cache is per-request; a follow-up either hits the kept prefix (fast) or recomputes everything (identical result). Pure performance optimization</td></tr>
+<tr><td>Each request carries the complete accumulated conversation text</td><td class="ok">✓</td><td>Correct <em>at the inference API boundary</em> — and it's <strong>why</strong> routing can be loose. The full text is the state; the KV cache is a precomputed derivative</td></tr>
+<tr><td>The client sends the full prompt to the replica</td><td class="bad">✗</td><td>In the consumer product, the client sends <strong>only the new message</strong>; the <strong>chat backend</strong> loads history from its DB, assembles the full prompt, and calls the inference API. "Client" in "client resends everything" means <em>whoever calls the inference API</em> — Anthropic's backend for claude.ai, your own server for API use</td></tr>
+</table>
+<div class="card">
+<pre style="margin:0"><code>Session state:   durable in the chat backend's DB (server side)
+KV cache:        per-turn, sharded with the replica, best-effort reused
+Replica routing: preferred sticky (cache hits), never required
+After long idle: prefix evicted from HBM within minutes → full prefill
+                 (visible as higher time-to-first-token)</code></pre>
+</div>
+<p>CDN analogy: the conversation text is the origin; the KV cache is an edge cache. Hit = fast, miss = recompute from origin. Correct either way.</p>
+
+<h2>4. Consumer Claude app — full path</h2>
+<p>The desktop app is an Electron-wrapped web client. Conversations live in Anthropic's cloud backend (which is why the same history appears in browser, desktop, and mobile). The control plane (backend + DB, co-located, multi-AZ) and the inference plane (GPU datacenters, placed where power exists) are separate — tolerable because backend→inference is one RPC per turn against a multi-second GPU operation.</p>
+<figure>
+<svg viewBox="0 0 680 500" role="img" aria-label="Claude consumer app architecture">
+<defs><marker id="ar1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="230" y="30" width="220" height="56" rx="8" fill="var(--gray-f)" stroke="var(--gray-s)" stroke-width="0.5"/>
+<text class="sv-h" x="340" y="52" text-anchor="middle" fill="var(--gray-t)">Claude desktop app</text>
+<text class="sv-s" x="340" y="72" text-anchor="middle" fill="var(--gray-u)">Thin client, stateless</text>
+<text class="sv-s" x="230" y="116" text-anchor="end" fill="var(--fg2)">New message only</text>
+<line x1="320" y1="86" x2="320" y2="140" stroke="var(--fg2)" stroke-width="1" marker-end="url(#ar1)"/>
+<line x1="360" y1="140" x2="360" y2="86" stroke="var(--green-line)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#ar1)"/>
+<text class="sv-s" x="450" y="116" text-anchor="start" fill="var(--fg2)">Streamed tokens (SSE)</text>
+<rect x="60" y="140" width="560" height="150" rx="16" fill="var(--teal-f)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="90" y="166" fill="var(--teal-t)">Anthropic control plane — cloud region, multi-AZ</text>
+<rect x="90" y="188" width="240" height="76" rx="10" fill="var(--bg)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="210" y="216" text-anchor="middle" fill="var(--teal-t)">Chat backend</text>
+<text class="sv-s" x="210" y="238" text-anchor="middle" fill="var(--teal-u)">Stateful; assembles full prompt</text>
+<rect x="400" y="188" width="190" height="76" rx="10" fill="var(--bg)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="495" y="216" text-anchor="middle" fill="var(--teal-t)">Conversation DB</text>
+<text class="sv-s" x="495" y="238" text-anchor="middle" fill="var(--teal-u)">Durable source of truth</text>
+<line x1="330" y1="216" x2="396" y2="216" stroke="var(--teal-s)" stroke-width="1" marker-end="url(#ar1)"/>
+<line x1="396" y1="240" x2="334" y2="240" stroke="var(--teal-s)" stroke-width="1" marker-end="url(#ar1)"/>
+<text class="sv-s" x="230" y="318" text-anchor="end" fill="var(--fg2)">Full prompt, one RPC per turn</text>
+<line x1="320" y1="290" x2="320" y2="344" stroke="var(--fg2)" stroke-width="1" marker-end="url(#ar1)"/>
+<line x1="360" y1="344" x2="360" y2="290" stroke="var(--green-line)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#ar1)"/>
+<text class="sv-s" x="450" y="318" text-anchor="start" fill="var(--fg2)">Tokens, step by step</text>
+<rect x="60" y="344" width="560" height="126" rx="16" fill="var(--purple-f)" stroke="var(--purple-s)" stroke-width="0.5"/>
+<text class="sv-h" x="90" y="370" fill="var(--purple-t)">Inference plane — GPU datacenter, possibly different region</text>
+<rect x="90" y="388" width="200" height="66" rx="10" fill="var(--bg)" stroke="var(--purple-s)" stroke-width="0.5"/>
+<text class="sv-h" x="190" y="412" text-anchor="middle" fill="var(--purple-t)">Inference gateway</text>
+<text class="sv-s" x="190" y="432" text-anchor="middle" fill="var(--purple-u)">Auth, prefix-aware routing</text>
+<rect x="360" y="388" width="230" height="66" rx="10" fill="var(--bg)" stroke="var(--purple-s)" stroke-width="0.5"/>
+<text class="sv-h" x="475" y="412" text-anchor="middle" fill="var(--purple-t)">Replica — 8 to 32 GPUs</text>
+<text class="sv-s" x="475" y="432" text-anchor="middle" fill="var(--purple-u)">Weights + per-turn KV cache</text>
+<line x1="290" y1="421" x2="356" y2="421" stroke="var(--purple-s)" stroke-width="1" marker-end="url(#ar1)"/>
+</svg>
+<figcaption>Consumer path. Solid arrows = request; dashed green = streamed response. Backend↔DB is chatty and co-located; backend→inference is one fat RPC and tolerates cross-region distance.</figcaption>
+</figure>
+<p>Per-turn sequence: client sends new message + conversation ID → backend reads history from DB → assembles full prompt → calls inference API → replica generates, tokens stream back → backend relays to client and writes both turns to the DB. The DB and the replica never communicate; both are passive backends of the app tier.</p>
+
+<h2>5. OpenClaw on LINE — same shape, different owner</h2>
+<p>The consumer chat backend is <strong>not</strong> publicly accessible. Developers use <code>api.anthropic.com/v1/messages</code> — which <em>is</em> the inference API: stateless, full-prompt-in / response-out, gateway in front of the replicas. Therefore <strong>OpenClaw must play the chat-backend role itself</strong>: store history per LINE user, reconstitute the full messages array every turn, persist the reply. Without that, every reply is amnesiac.</p>
+<figure>
+<svg viewBox="0 0 680 530" role="img" aria-label="OpenClaw LINE bot architecture">
+<defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="80" y="30" width="180" height="56" rx="8" fill="var(--gray-f)" stroke="var(--gray-s)" stroke-width="0.5"/>
+<text class="sv-h" x="170" y="52" text-anchor="middle" fill="var(--gray-t)">LINE user</text>
+<text class="sv-s" x="170" y="72" text-anchor="middle" fill="var(--gray-u)">Chat message</text>
+<rect x="420" y="30" width="180" height="56" rx="8" fill="var(--gray-f)" stroke="var(--gray-s)" stroke-width="0.5"/>
+<text class="sv-h" x="510" y="52" text-anchor="middle" fill="var(--gray-t)">LINE platform</text>
+<text class="sv-s" x="510" y="72" text-anchor="middle" fill="var(--gray-u)">Webhook + reply API</text>
+<line x1="260" y1="50" x2="416" y2="50" stroke="var(--fg2)" stroke-width="1" marker-end="url(#ar2)"/>
+<line x1="416" y1="70" x2="264" y2="70" stroke="var(--green-line)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#ar2)"/>
+<text class="sv-s" x="420" y="119" text-anchor="end" fill="var(--fg2)">Webhook: new message only</text>
+<line x1="480" y1="86" x2="480" y2="150" stroke="var(--fg2)" stroke-width="1" marker-end="url(#ar2)"/>
+<line x1="520" y1="150" x2="520" y2="86" stroke="var(--green-line)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#ar2)"/>
+<text class="sv-s" x="530" y="119" text-anchor="start" fill="var(--fg2)">Reply text</text>
+<rect x="60" y="150" width="560" height="156" rx="16" fill="var(--teal-f)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="90" y="176" fill="var(--teal-t)">Your infrastructure — you build and operate this</text>
+<rect x="90" y="198" width="250" height="84" rx="10" fill="var(--bg)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="215" y="224" text-anchor="middle" fill="var(--teal-t)">OpenClaw server</text>
+<text class="sv-s" x="215" y="244" text-anchor="middle" fill="var(--teal-u)">Plays the chat-backend role</text>
+<text class="sv-s" x="215" y="262" text-anchor="middle" fill="var(--teal-u)">Load history, append, store reply</text>
+<rect x="410" y="198" width="180" height="84" rx="10" fill="var(--bg)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="500" y="228" text-anchor="middle" fill="var(--teal-t)">Your store</text>
+<text class="sv-s" x="500" y="252" text-anchor="middle" fill="var(--teal-u)">History per LINE user</text>
+<line x1="340" y1="228" x2="406" y2="228" stroke="var(--teal-s)" stroke-width="1" marker-end="url(#ar2)"/>
+<line x1="406" y1="252" x2="344" y2="252" stroke="var(--teal-s)" stroke-width="1" marker-end="url(#ar2)"/>
+<text class="sv-s" x="230" y="338" text-anchor="end" fill="var(--fg2)">POST /v1/messages, full history</text>
+<line x1="320" y1="306" x2="320" y2="362" stroke="var(--fg2)" stroke-width="1" marker-end="url(#ar2)"/>
+<line x1="360" y1="362" x2="360" y2="306" stroke="var(--green-line)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#ar2)"/>
+<text class="sv-s" x="450" y="338" text-anchor="start" fill="var(--fg2)">Response or stream</text>
+<rect x="60" y="362" width="560" height="132" rx="16" fill="var(--purple-f)" stroke="var(--purple-s)" stroke-width="0.5"/>
+<text class="sv-h" x="90" y="388" fill="var(--purple-t)">Anthropic inference — same clusters as the consumer app</text>
+<rect x="90" y="408" width="210" height="66" rx="10" fill="var(--bg)" stroke="var(--purple-s)" stroke-width="0.5"/>
+<text class="sv-h" x="195" y="432" text-anchor="middle" fill="var(--purple-t)">api.anthropic.com</text>
+<text class="sv-s" x="195" y="452" text-anchor="middle" fill="var(--purple-u)">API key, quota, routing</text>
+<rect x="370" y="408" width="220" height="66" rx="10" fill="var(--bg)" stroke="var(--purple-s)" stroke-width="0.5"/>
+<text class="sv-h" x="480" y="432" text-anchor="middle" fill="var(--purple-t)">Replica</text>
+<text class="sv-s" x="480" y="452" text-anchor="middle" fill="var(--purple-u)">Same GPU pools, KV cache</text>
+<line x1="300" y1="441" x2="366" y2="441" stroke="var(--purple-s)" stroke-width="1" marker-end="url(#ar2)"/>
+</svg>
+<figcaption>OpenClaw path. Structurally identical to the consumer path — the stateful middle tier just changes ownership.</figcaption>
+</figure>
+<pre><code>You on desktop app:  Claude app → Anthropic chat backend + DB → inference API → replica
+Your LINE users:     LINE app  → OpenClaw + your storage       → inference API → replica</code></pre>
+
+<h2>6. Failure and recovery</h2>
+<p><strong>DB side (control plane):</strong> standard multi-AZ synchronous replication — AZ failure triggers automatic standby promotion in seconds-to-minutes, no data loss. Cross-region posture (backups vs async replica vs active-active) is not public for Anthropic. If the full region fails, the consumer product is down even though the GPUs are fine, because the backend must read the DB to assemble the prompt.</p>
+<p><strong>Inference side:</strong> when a replica dies mid-generation, its KV caches vanish with the HBM — never checkpointed (checkpointing GBs per request per token step would cost more than it saves). Recovery is not failover but <strong>full redo</strong>: resend the full prompt to another replica, prefill from token zero, regenerate.</p>
+<figure>
+<svg viewBox="0 0 680 520" role="img" aria-label="Failure and recovery paths">
+<defs><marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="40" y="30" width="330" height="400" rx="16" fill="var(--purple-f)" stroke="var(--purple-s)" stroke-width="0.5"/>
+<text class="sv-h" x="60" y="56" fill="var(--purple-t)">Inference failure — retry</text>
+<rect x="90" y="76" width="230" height="60" rx="8" fill="var(--bg)" stroke="var(--gray-s)" stroke-width="0.5"/>
+<text class="sv-h" x="205" y="100" text-anchor="middle" fill="var(--gray-t)">Chat backend</text>
+<text class="sv-s" x="205" y="120" text-anchor="middle" fill="var(--gray-u)">Holds full text — can retry</text>
+<line x1="150" y1="136" x2="150" y2="192" stroke="var(--red-line)" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#ar3)"/>
+<text class="sv-s" x="162" y="168" text-anchor="start" fill="var(--fg2)">Attempt 1</text>
+<rect x="70" y="196" width="270" height="76" rx="10" fill="var(--red-f)" stroke="var(--red-s)" stroke-width="0.5"/>
+<text class="sv-h" x="205" y="222" text-anchor="middle" fill="var(--red-t)">Replica A — dies mid-stream</text>
+<text class="sv-s" x="205" y="242" text-anchor="middle" fill="var(--red-u)">One GPU fails, whole replica down</text>
+<text class="sv-s" x="205" y="260" text-anchor="middle" fill="var(--red-u)">KV cache gone with HBM</text>
+<line x1="150" y1="272" x2="150" y2="328" stroke="var(--fg2)" stroke-width="1" marker-end="url(#ar3)"/>
+<text class="sv-s" x="162" y="302" text-anchor="start" fill="var(--fg2)">Attempt 2, from scratch</text>
+<rect x="70" y="332" width="270" height="76" rx="10" fill="var(--teal-f)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="205" y="358" text-anchor="middle" fill="var(--teal-t)">Replica B — full redo</text>
+<text class="sv-s" x="205" y="378" text-anchor="middle" fill="var(--teal-u)">Prefill entire prompt again</text>
+<text class="sv-s" x="205" y="396" text-anchor="middle" fill="var(--teal-u)">Fresh KV cache, new stream</text>
+<rect x="400" y="30" width="240" height="400" rx="16" fill="var(--teal-f)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="420" y="56" fill="var(--teal-t)">DB failure — failover</text>
+<rect x="430" y="76" width="180" height="60" rx="8" fill="var(--bg)" stroke="var(--gray-s)" stroke-width="0.5"/>
+<text class="sv-h" x="520" y="100" text-anchor="middle" fill="var(--gray-t)">Writes</text>
+<text class="sv-s" x="520" y="120" text-anchor="middle" fill="var(--gray-u)">Sync to both AZs</text>
+<line x1="520" y1="136" x2="520" y2="192" stroke="var(--fg2)" stroke-width="1" marker-end="url(#ar3)"/>
+<rect x="430" y="196" width="180" height="76" rx="10" fill="var(--red-f)" stroke="var(--red-s)" stroke-width="0.5"/>
+<text class="sv-h" x="520" y="222" text-anchor="middle" fill="var(--red-t)">Primary — AZ 1</text>
+<text class="sv-s" x="520" y="242" text-anchor="middle" fill="var(--red-u)">AZ outage</text>
+<text class="sv-s" x="520" y="260" text-anchor="middle" fill="var(--red-u)">No data lost</text>
+<line x1="520" y1="272" x2="520" y2="328" stroke="var(--fg2)" stroke-width="1" marker-end="url(#ar3)"/>
+<text class="sv-s" x="532" y="302" text-anchor="start" fill="var(--fg2)">Auto-promote</text>
+<rect x="430" y="332" width="180" height="76" rx="10" fill="var(--bg)" stroke="var(--teal-s)" stroke-width="0.5"/>
+<text class="sv-h" x="520" y="358" text-anchor="middle" fill="var(--teal-t)">Standby — AZ 2</text>
+<text class="sv-s" x="520" y="378" text-anchor="middle" fill="var(--teal-u)">Promoted in seconds</text>
+<text class="sv-s" x="520" y="396" text-anchor="middle" fill="var(--teal-u)">History intact</text>
+<text class="sv-s" x="340" y="470" text-anchor="middle" fill="var(--fg2)">Left: stateless retry, work is redone. Right: stateful failover, state is preserved.</text>
+</svg>
+<figcaption>Two failure domains, opposite recovery styles.</figcaption>
+</figure>
+<p>User-visible consequences of a mid-stream replica death: a latency spike (full prefill + regenerating tokens already produced), and possibly a <em>different</em> answer — sampling is stochastic, and Replica B produces a new stream, not a resumption (some stacks force the already-streamed tokens as a prefix to hide this).</p>
+<p>Blast radius asymmetry: one dead GPU kills one replica and ~100 in-flight requests, but the fleet self-heals in seconds — router marks it dead, traffic rebalances, requests retry. The boring SQL database is the actual single point of durable truth and gets all the failover engineering. The old rule survives intact: <strong>statelessness buys cheap recovery; state is where the engineering lives.</strong> The LLM stack made its enormous transient state (KV caches) disposable by design — that choice is what makes the whole thing operable.</p>
+
+<h2>7. Operational takeaways for OpenClaw</h2>
+<ol>
+<li><strong>Build the memory loop:</strong> store history per LINE user → load + append on each webhook → send the full messages array to <code>/v1/messages</code> → persist the reply. No history = amnesiac bot.</li>
+<li><strong>Retries are your job:</strong> on API errors or broken streams, your code retries. Idempotent and safe since the request is stateless; cost is tokens and time.</li>
+<li><strong>Prompt caching:</strong> long conversations resend an ever-growing prefix each turn. Use the API's explicit prompt caching (cache-control breakpoints on the stable prefix) to cut input-token cost — the KV cache mechanics turned into a billing optimization.</li>
+<li><strong>Back up your store:</strong> unlike Anthropic's multi-AZ DB, your VPS has no built-in redundancy. If it dies, your users' histories die with it.</li>
+</ol>
+
+<footer>Generated from a Claude session, August 2026. Cluster sizing figures are order-of-magnitude estimates based on public serving practice (vLLM/TensorRT-LLM-class stacks); Anthropic's internal topology is not public.</footer>
+
+</main>
+</body>
+</html>
