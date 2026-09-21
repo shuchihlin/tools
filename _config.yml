@@ -1,0 +1,8 @@
+# Files Jekyll should not process or copy into the published site.
+# INCIDENT.md is the editable source for INCIDENT.html; without this exclude,
+# Jekyll converts the .md into its own INCIDENT.html and that generated page
+# wins over the hand-built static file (which carries the pre-rendered diagram).
+exclude:
+  - INCIDENT.md
+  - build_incident_html.py
+  - README.md
