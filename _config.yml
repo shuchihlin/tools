@@ -4,5 +4,6 @@
 # wins over the hand-built static file (which carries the pre-rendered diagram).
 exclude:
   - INCIDENT.md
+  - INCIDENT-zh.md
   - build_incident_html.py
   - README.md
