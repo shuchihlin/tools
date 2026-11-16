@@ -6,4 +6,4 @@ exclude:
   - INCIDENT.md
   - INCIDENT-zh.md
   - build_incident_html.py
-  - README.md
+
