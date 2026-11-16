@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1080" viewBox="0 0 760 1080" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .title { font-size: 18px; font-weight: 600; fill: #1a1a2e; }
+    .big   { font-size: 15px; fill: #1a1a2e; }
+    .hdr   { font-size: 14px; font-weight: 600; fill: #1a1a2e; }
+    .small { font-size: 12px; fill: #444; }
+    .tiny  { font-size: 11px; fill: #666; }
+    .mono  { font-family: Consolas, monospace; font-size: 14px; fill: #1a1a2e; }
+    .monosm{ font-family: Consolas, monospace; font-size: 12px; fill: #444; }
+  </style>
+  <rect width="760" height="1080" fill="#ffffff"/>
+
+  <text x="20" y="32" class="title">Quantization = writing each number with fewer digits</text>
+
+  <!-- ===== A: the analogy ===== -->
+  <text x="20" y="72" class="hdr">A — The idea, with a ruler</text>
+
+  <text x="40" y="98" class="big">A precise caliper can read 0.457 cm. A cheap ruler only has tick marks —</text>
+  <text x="40" y="120" class="big">so you must report the NEAREST TICK. That is the whole trick.</text>
+
+  <!-- fine ruler -->
+  <text x="40" y="162" class="small" font-weight="600">FP16 = fine ruler (65,000 possible readings)</text>
+  <line x1="40" y1="178" x2="700" y2="178" stroke="#0b6e99" stroke-width="2"/>
+  <g stroke="#0b6e99" stroke-width="0.6">
+    <line x1="40" y1="172" x2="40" y2="186"/><line x1="53" y1="174" x2="53" y2="184"/>
+    <line x1="66" y1="174" x2="66" y2="184"/><line x1="79" y1="174" x2="79" y2="184"/>
+    <line x1="92" y1="174" x2="92" y2="184"/><line x1="105" y1="174" x2="105" y2="184"/>
+    <line x1="118" y1="174" x2="118" y2="184"/><line x1="131" y1="174" x2="131" y2="184"/>
+    <line x1="144" y1="174" x2="144" y2="184"/><line x1="157" y1="174" x2="157" y2="184"/>
+    <line x1="170" y1="174" x2="170" y2="184"/><line x1="183" y1="174" x2="183" y2="184"/>
+    <line x1="196" y1="174" x2="196" y2="184"/><line x1="209" y1="174" x2="209" y2="184"/>
+    <line x1="222" y1="174" x2="222" y2="184"/><line x1="235" y1="174" x2="235" y2="184"/>
+    <line x1="248" y1="174" x2="248" y2="184"/><line x1="261" y1="174" x2="261" y2="184"/>
+    <line x1="274" y1="174" x2="274" y2="184"/><line x1="287" y1="174" x2="287" y2="184"/>
+    <line x1="300" y1="174" x2="300" y2="184"/><line x1="313" y1="174" x2="313" y2="184"/>
+    <line x1="326" y1="174" x2="326" y2="184"/><line x1="339" y1="174" x2="339" y2="184"/>
+    <line x1="352" y1="174" x2="352" y2="184"/><line x1="365" y1="174" x2="365" y2="184"/>
+    <line x1="378" y1="174" x2="378" y2="184"/><line x1="391" y1="174" x2="391" y2="184"/>
+    <line x1="404" y1="174" x2="404" y2="184"/><line x1="417" y1="174" x2="417" y2="184"/>
+    <line x1="430" y1="174" x2="430" y2="184"/><line x1="443" y1="174" x2="443" y2="184"/>
+    <line x1="456" y1="174" x2="456" y2="184"/><line x1="469" y1="174" x2="469" y2="184"/>
+    <line x1="482" y1="174" x2="482" y2="184"/><line x1="495" y1="174" x2="495" y2="184"/>
+    <line x1="508" y1="174" x2="508" y2="184"/><line x1="521" y1="174" x2="521" y2="184"/>
+    <line x1="534" y1="174" x2="534" y2="184"/><line x1="547" y1="174" x2="547" y2="184"/>
+    <line x1="560" y1="174" x2="560" y2="184"/><line x1="573" y1="174" x2="573" y2="184"/>
+    <line x1="586" y1="174" x2="586" y2="184"/><line x1="599" y1="174" x2="599" y2="184"/>
+    <line x1="612" y1="174" x2="612" y2="184"/><line x1="625" y1="174" x2="625" y2="184"/>
+    <line x1="638" y1="174" x2="638" y2="184"/><line x1="651" y1="174" x2="651" y2="184"/>
+    <line x1="664" y1="174" x2="664" y2="184"/><line x1="677" y1="174" x2="677" y2="184"/>
+    <line x1="690" y1="174" x2="690" y2="184"/>
+  </g>
+
+  <!-- coarse ruler -->
+  <text x="40" y="226" class="small" font-weight="600">INT4 = cheap ruler (only 15 ticks)</text>
+  <line x1="40" y1="242" x2="700" y2="242" stroke="#b5651d" stroke-width="2"/>
+  <g stroke="#b5651d" stroke-width="1.6">
+    <line x1="40" y1="232" x2="40" y2="252"/><line x1="87" y1="234" x2="87" y2="250"/>
+    <line x1="134" y1="234" x2="134" y2="250"/><line x1="181" y1="234" x2="181" y2="250"/>
+    <line x1="228" y1="234" x2="228" y2="250"/><line x1="275" y1="234" x2="275" y2="250"/>
+    <line x1="322" y1="234" x2="322" y2="250"/><line x1="370" y1="230" x2="370" y2="254"/>
+    <line x1="417" y1="234" x2="417" y2="250"/><line x1="464" y1="234" x2="464" y2="250"/>
+    <line x1="511" y1="234" x2="511" y2="250"/><line x1="558" y1="234" x2="558" y2="250"/>
+    <line x1="605" y1="234" x2="605" y2="250"/><line x1="652" y1="234" x2="652" y2="250"/>
+    <line x1="700" y1="232" x2="700" y2="252"/>
+  </g>
+  <text x="30" y="272" class="monosm">-7</text>
+  <text x="364" y="272" class="monosm">0</text>
+  <text x="692" y="272" class="monosm">+7</text>
+  <text x="40" y="294" class="small">Each reading is now just a tick NUMBER from −7 to +7 — and a number that small fits in 4 bits.</text>
+
+  <!-- ===== B: worked example ===== -->
+  <text x="20" y="338" class="hdr">B — Four real weights, done by hand</text>
+
+  <rect x="40" y="352" width="680" height="226" rx="8" fill="#f4f7fa" stroke="#c9d4dd"/>
+
+  <text x="56" y="378" class="mono">the 4 weights:        0.8    −0.3    0.5    −0.6</text>
+
+  <text x="56" y="412" class="small">Step 1 — how big is the biggest? 0.8. So one tick is worth:</text>
+  <text x="56" y="438" class="mono">tick size  s = 0.8 ÷ 7 = 0.114          ← store this ONE number as a normal float</text>
+
+  <text x="56" y="472" class="small">Step 2 — how many ticks is each weight? Round to the nearest whole tick:</text>
+  <text x="56" y="498" class="mono">0.8 ÷ 0.114 = 7.00 → 7      0.5 ÷ 0.114 = 4.38 → 4</text>
+  <text x="56" y="520" class="mono">−0.3 ÷ 0.114 = −2.63 → −3   −0.6 ÷ 0.114 = −5.25 → −5</text>
+
+  <text x="56" y="554" class="mono" font-weight="600">STORED:   s = 0.114   and   [ 7, −3, 4, −5 ]</text>
+
+  <!-- read back -->
+  <text x="20" y="618" class="hdr">C — Reading it back (this is "dequantize")</text>
+  <rect x="40" y="632" width="680" height="128" rx="8" fill="#ffffff" stroke="#c9d4dd"/>
+  <text x="56" y="658" class="mono">tick number × tick size  =  the number again</text>
+  <text x="56" y="686" class="mono">7×0.114 = 0.800     −3×0.114 = −0.343     4×0.114 = 0.457     −5×0.114 = −0.571</text>
+  <line x1="56" y1="700" x2="704" y2="700" stroke="#e4eaef"/>
+  <text x="56" y="722" class="mono">original:   0.8    −0.3     0.5    −0.6</text>
+  <text x="56" y="744" class="mono">got back:   0.8    −0.343   0.457  −0.571     ← off by at most half a tick</text>
+
+  <rect x="40" y="774" width="680" height="46" rx="6" fill="#fdf3e7" stroke="#d9b98a"/>
+  <text x="56" y="794" class="small" font-weight="600">The error is PERMANENT. −0.3 is gone forever; you only ever get −0.343 back.</text>
+  <text x="56" y="812" class="small">Nothing recovers it. You accepted the damage in exchange for smaller storage.</text>
+
+  <!-- ===== D: the saving ===== -->
+  <text x="20" y="862" class="hdr">D — What you actually saved</text>
+  <rect x="40" y="876" width="680" height="94" rx="8" fill="#f0f7f0" stroke="#4a8a4a"/>
+  <text x="56" y="900" class="monosm">just these 4 weights:   FP16 = 4×2 B = 8 B   →   INT4 = 4×½ B + 2 B scale = 4 B   (2× smaller)</text>
+  <text x="56" y="926" class="monosm">a real group of 64:     FP16 = 64×2 B = 128 B →   INT4 = 64×½ B + 2 B scale = 34 B  (3.8× smaller)</text>
+  <text x="56" y="954" class="small">That's why groups are 64 and not 4 — one scale spread over more weights makes its cost vanish.</text>
+
+  <!-- ===== E: the taxonomy ===== -->
+  <text x="20" y="1010" class="hdr">E — "Is this an FP16→FP8 thing or an FP16→FP4 thing?"  Neither. It's the general idea.</text>
+  <text x="40" y="1036" class="small">Quantization just means "use fewer bits per weight." The format name only says HOW MANY bits, and</text>
+  <text x="40" y="1056" class="small">whether the small thing is a tiny FLOAT (FP8, FP4 — no scale needed) or an INTEGER + a shared scale (INT8, INT4).</text>
+</svg>

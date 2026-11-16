@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1080" viewBox="0 0 760 1080" font-family="Segoe UI, Arial, sans-serif" xmlns:c2pa="http://c2pa.org/manifest">
+  <style>
+    .title { font-size: 17px; font-weight: 600; fill: #1a1a2e; }
+    .sub   { font-size: 12px; fill: #555; }
+    .lbl   { font-size: 12px; fill: #1a1a2e; }
+    .small { font-size: 11px; fill: #444; }
+    .tiny  { font-size: 10px; fill: #555; }
+    .mono  { font-family: Consolas, monospace; font-size: 12.5px; fill: #1a1a2e; }
+    .monosm{ font-family: Consolas, monospace; font-size: 11px; fill: #444; }
+    .hdr   { font-size: 13px; font-weight: 600; fill: #1a1a2e; }
+  </style>
+  <rect width="760" height="1080" fill="#ffffff"/>
+
+  <text x="20" y="30" class="title">Tracing one real request: "how is the weather today"</text>
+  <text x="20" y="50" class="sub">Llama 3 8B, BF16, one H100, batch 1. Everything below is one trip through the Session 0 loop, m+1 times.</text>
+
+  <!-- Panel A: what actually enters -->
+  <text x="20" y="84" class="hdr">A — What the model actually receives (chat is completion: your words are a fragment of it)</text>
+  <rect x="40" y="96" width="680" height="132" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="118" class="monosm">&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;</text>
+  <text x="56" y="136" class="monosm">You are a helpful assistant.&lt;|eot_id|&gt;     ← system prompt: you never typed it</text>
+  <text x="56" y="154" class="monosm">&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;</text>
+  <text x="56" y="172" class="monosm">how is the weather today&lt;|eot_id|&gt;         ← your 5 words = 5 tokens</text>
+  <line x1="56" y1="200" x2="704" y2="200" stroke="#c9d4dd"/>
+  <text x="56" y="190" class="monosm">&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;    ← the model continues from here</text>
+  <text x="56" y="218" class="mono">n ≈ 30 tokens total  →  X = [30 × 4096]</text>
+
+  <!-- Panel B: timeline -->
+  <text x="20" y="256" class="hdr">B — The wall clock, drawn to scale (1 px ≈ 0.31 ms)</text>
+
+  <!-- prefill block -->
+  <rect x="40" y="272" width="14" height="44" fill="#b5651d" opacity="0.8"/>
+  <text x="40" y="266" class="tiny" fill="#b5651d">PREFILL</text>
+  <!-- decode ticks -->
+  <g fill="#0b6e99" opacity="0.55">
+    <rect x="56" y="272" width="12" height="44"/><rect x="70" y="272" width="12" height="44"/>
+    <rect x="84" y="272" width="12" height="44"/><rect x="98" y="272" width="12" height="44"/>
+    <rect x="112" y="272" width="12" height="44"/><rect x="126" y="272" width="12" height="44"/>
+    <rect x="140" y="272" width="12" height="44"/><rect x="154" y="272" width="12" height="44"/>
+    <rect x="168" y="272" width="12" height="44"/><rect x="182" y="272" width="12" height="44"/>
+    <rect x="196" y="272" width="12" height="44"/><rect x="210" y="272" width="12" height="44"/>
+    <rect x="224" y="272" width="12" height="44"/><rect x="238" y="272" width="12" height="44"/>
+    <rect x="252" y="272" width="12" height="44"/><rect x="266" y="272" width="12" height="44"/>
+    <rect x="280" y="272" width="12" height="44"/><rect x="294" y="272" width="12" height="44"/>
+    <rect x="308" y="272" width="12" height="44"/><rect x="322" y="272" width="12" height="44"/>
+    <rect x="336" y="272" width="12" height="44"/><rect x="350" y="272" width="12" height="44"/>
+    <rect x="364" y="272" width="12" height="44"/><rect x="378" y="272" width="12" height="44"/>
+    <rect x="392" y="272" width="12" height="44"/><rect x="406" y="272" width="12" height="44"/>
+    <rect x="420" y="272" width="12" height="44"/><rect x="434" y="272" width="12" height="44"/>
+    <rect x="448" y="272" width="12" height="44"/><rect x="462" y="272" width="12" height="44"/>
+    <rect x="476" y="272" width="12" height="44"/><rect x="490" y="272" width="12" height="44"/>
+    <rect x="504" y="272" width="12" height="44"/><rect x="518" y="272" width="12" height="44"/>
+    <rect x="532" y="272" width="12" height="44"/><rect x="546" y="272" width="12" height="44"/>
+    <rect x="560" y="272" width="12" height="44"/><rect x="574" y="272" width="12" height="44"/>
+    <rect x="588" y="272" width="12" height="44"/><rect x="602" y="272" width="12" height="44"/>
+    <rect x="616" y="272" width="12" height="44"/><rect x="630" y="272" width="12" height="44"/>
+    <rect x="644" y="272" width="12" height="44"/><rect x="658" y="272" width="12" height="44"/>
+    <rect x="672" y="272" width="12" height="44"/>
+  </g>
+  <text x="230" y="266" class="tiny" fill="#0b6e99">DECODE — 45 passes, one token each, 4.5 ms apiece</text>
+
+  <line x1="40" y1="320" x2="40" y2="334" stroke="#555"/>
+  <line x1="56" y1="320" x2="56" y2="334" stroke="#555"/>
+  <line x1="684" y1="320" x2="684" y2="334" stroke="#555"/>
+  <text x="30" y="348" class="monosm">0</text>
+  <text x="40" y="366" class="monosm">↑ 4.5 ms: first token appears (TTFT)</text>
+  <text x="646" y="348" class="monosm">206 ms</text>
+
+  <rect x="40" y="380" width="680" height="72" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="402" class="mono">prefill:  1 pass  × 4.5 ms =   4.5 ms   (2%)   ← all 30 prompt positions at once</text>
+  <text x="56" y="422" class="mono">decode:  45 passes × 4.5 ms = 202   ms   (98%)  ← "I don't have access to real-time…"</text>
+  <text x="56" y="442" class="small">Prefill happens ONCE, at the front. Decode happens once per output token. That is the whole schedule.</text>
+
+  <!-- Panel C: the qualifier -->
+  <text x="20" y="492" class="hdr">C — Qualifier: prefill is compute-bound only when the prompt is LONG</text>
+  <text x="20" y="512" class="sub">The ridge sits at 295 FLOPs/byte, and prefill's intensity ≈ n. So the crossover is n ≈ 295 tokens.</text>
+
+  <!-- number line -->
+  <line x1="70" y1="580" x2="690" y2="580" stroke="#999" stroke-width="1.5"/>
+  <rect x="70" y="566" width="180" height="28" fill="#0b6e99" opacity="0.18"/>
+  <rect x="250" y="566" width="440" height="28" fill="#b5651d" opacity="0.18"/>
+  <line x1="250" y1="558" x2="250" y2="602" stroke="#555" stroke-dasharray="4,3"/>
+  <text x="228" y="616" class="monosm">n ≈ 295</text>
+  <text x="90" y="585" class="small" fill="#0b6e99">bandwidth-bound prefill</text>
+  <text x="400" y="585" class="small" fill="#b5651d">compute-bound prefill</text>
+  <text x="76" y="640" class="small">chat questions,</text>
+  <text x="76" y="656" class="small">short prompts (n=30 here)</text>
+  <text x="400" y="640" class="small">pasted documents, RAG chunks,</text>
+  <text x="400" y="656" class="small">long transcripts, code files</text>
+
+  <rect x="40" y="676" width="680" height="60" rx="6" fill="#fdf3e7" stroke="#d9b98a"/>
+  <text x="56" y="698" class="mono">n=30:  450 GFLOPs of work, but still one full 15 GB weight stream → 4.5 ms, ALU-idle</text>
+  <text x="56" y="718" class="small">A 30-token prompt costs the same wall time as a 295-token one. Prefill's first ~295 tokens are effectively free.</text>
+
+  <!-- Panel D: multi-turn -->
+  <text x="20" y="778" class="hdr">D — Turn 2: "what about tomorrow?" — prefill runs again, over the WHOLE transcript</text>
+
+  <rect x="40" y="796" width="680" height="150" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="818" class="monosm">turn 1 context:  [system + Q1]                          n = 30   → prefill</text>
+  <text x="56" y="838" class="monosm">turn 1 output:   [A1]                                   m = 45   → decode</text>
+  <text x="56" y="862" class="monosm">turn 2 context:  [system + Q1 + A1 + Q2]                n = 82   → prefill AGAIN</text>
+  <text x="56" y="886" class="small">The model is stateless — it holds nothing between requests. Each turn re-reads the entire transcript from scratch.</text>
+  <text x="56" y="908" class="small" font-weight="600">Prefix caching: the KV entries for the first 75 tokens are unchanged, so servers keep and reuse them —</text>
+  <text x="56" y="928" class="small">only the 7 new tokens are prefilled. This is exactly the "cache read" line item on API bills.</text>
+
+  <rect x="40" y="966" width="680" height="94" rx="6" fill="#eef5f9" stroke="#0b6e99"/>
+  <text x="56" y="988" class="hdr">The rule, in one line</text>
+  <text x="56" y="1012" class="small">PREFILL = reading tokens that already exist (yours). Parallel, once per request, sets time-to-first-token.</text>
+  <text x="56" y="1032" class="small">DECODE  = making tokens that don't exist yet (its own). Serial, once per output token, sets the drip rate.</text>
+  <text x="56" y="1052" class="small">The boundary is not "prompt vs answer" — it is "already known vs not yet sampled."</text>
+<metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo2OGEzMGY3Yy03MWI1LTQ4ZTktYTllYS1mN2JhYWVjZTRmZTMAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaBntzWwZF429QLt66bnIwdQAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDo5M2U2ZTMwNy1lY2VmLTRjYjAtODk5Yi0wZWY5NThkZDEwMzBscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoH6q2roED0lB4ZnoBWj8EzgAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggcjNLq8JrmaTAqqe3NkqQOY/f074P0qNPXNaCAZ6wRQikZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaFrmnceCLc4LQqRjcjcGTGYAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIBO812k+gxO2fyh4AOV/2iP4BwPLoxTHBEcG2ib8lCRXZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GSIGZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjY4YTMwZjdjLTcxYjUtNDhlOS1hOWVhLWY3YmFhZWNlNGZlMy9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjViNzkzZTg0LTFjY2UtNDA1Yy1hZTFlLWQwZWM2NDhhNDYxYnJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCByM0urwmuZpMCqp7c2SpA5j9/Tvg/So09c1oIBnrBFCKJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFgg2zARMHTplENKvScyvlArqymUiBjO4mDxdFST2oLYIOSiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggJ7NmMehtpJ0rr6ymbQYRnfd2ztlGb5XirHLtV65IgdV0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQDd9SR8YLX6k6nbkDJyRkaToTc/E8RhQsgZP89K4hhAv/VMxlg9VeB7YQSDOizMuLgZRsYgSfRRndBDs6v16BrI=</c2pa:manifest></metadata></svg>

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 520" width="680" height="520" font-family="Helvetica, Arial, sans-serif"><title>S3 fig1: attention, tired vs wide</title><rect width="680" height="520" fill="#ffffff"/>
+<text x="340" y="28" text-anchor="middle" font-size="14" fill="#444441" font-weight="bold">"The animal didn't cross the street because it was too ___"</text>
+<text x="23" y="50" text-anchor="start" font-size="13" fill="#444441" font-weight="bold">Last word = "tired"</text>
+<path d="M630.0 170 Q 340.0 54 50.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M630.0 170 Q 369.0 64 108.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="13.75" opacity="1.00"/>
+<path d="M630.0 170 Q 398.0 74 166.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.30"/>
+<path d="M630.0 170 Q 427.0 84 224.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="1.0" opacity="0.35"/>
+<path d="M630.0 170 Q 456.0 94 282.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.20"/>
+<path d="M630.0 170 Q 485.0 104 340.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="2.0" opacity="0.55"/>
+<path d="M630.0 170 Q 514.0 114 398.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.30"/>
+<path d="M630.0 170 Q 543.0 124 456.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="4.5" opacity="1.00"/>
+<path d="M630.0 170 Q 572.0 134 514.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.30"/>
+<path d="M630.0 170 Q 601.0 144 572.0 170" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.30"/>
+<rect x="23" y="170" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="50.0" y="190.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">The</text>
+<text x="50.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">2%</text>
+<rect x="81" y="170" width="54" height="32" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><text x="108.0" y="190.0" text-anchor="middle" font-size="12" fill="#3C3489" font-weight="normal">animal</text>
+<text x="108.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">55%</text>
+<rect x="139" y="170" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="166.0" y="190.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">didn't</text>
+<text x="166.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">3%</text>
+<rect x="197" y="170" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="224.0" y="190.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">cross</text>
+<text x="224.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">4%</text>
+<rect x="255" y="170" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="282.0" y="190.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">the</text>
+<text x="282.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">1%</text>
+<rect x="313" y="170" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="340.0" y="190.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">street</text>
+<text x="340.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">8%</text>
+<rect x="371" y="170" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="398.0" y="190.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">because</text>
+<text x="398.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">3%</text>
+<rect x="429" y="170" width="54" height="32" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><text x="456.0" y="190.0" text-anchor="middle" font-size="12" fill="#3C3489" font-weight="normal">it</text>
+<text x="456.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">18%</text>
+<rect x="487" y="170" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="514.0" y="190.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">was</text>
+<text x="514.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">3%</text>
+<rect x="545" y="170" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="572.0" y="190.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">too</text>
+<text x="572.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">3%</text>
+<rect x="603" y="170" width="54" height="32" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.8"/><text x="630.0" y="190.0" text-anchor="middle" font-size="12" fill="#633806" font-weight="bold">tired</text>
+<text x="630.0" y="220" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">query</text>
+<text x="23" y="280" text-anchor="start" font-size="13" fill="#444441" font-weight="bold">Last word = "wide"</text>
+<path d="M630.0 400 Q 340.0 284 50.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.20"/>
+<path d="M630.0 400 Q 369.0 294 108.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="1.75" opacity="0.50"/>
+<path d="M630.0 400 Q 398.0 304 166.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M630.0 400 Q 427.0 314 224.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="1.25" opacity="0.40"/>
+<path d="M630.0 400 Q 456.0 324 282.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M630.0 400 Q 485.0 334 340.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="14.5" opacity="1.00"/>
+<path d="M630.0 400 Q 514.0 344 398.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.30"/>
+<path d="M630.0 400 Q 543.0 354 456.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="3.75" opacity="0.90"/>
+<path d="M630.0 400 Q 572.0 364 514.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.30"/>
+<path d="M630.0 400 Q 601.0 374 572.0 400" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="1.0" opacity="0.35"/>
+<rect x="23" y="400" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="50.0" y="420.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">The</text>
+<text x="50.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">1%</text>
+<rect x="81" y="400" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="108.0" y="420.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">animal</text>
+<text x="108.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">7%</text>
+<rect x="139" y="400" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="166.0" y="420.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">didn't</text>
+<text x="166.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">2%</text>
+<rect x="197" y="400" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="224.0" y="420.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">cross</text>
+<text x="224.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">5%</text>
+<rect x="255" y="400" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="282.0" y="420.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">the</text>
+<text x="282.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">2%</text>
+<rect x="313" y="400" width="54" height="32" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><text x="340.0" y="420.0" text-anchor="middle" font-size="12" fill="#3C3489" font-weight="normal">street</text>
+<text x="340.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">58%</text>
+<rect x="371" y="400" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="398.0" y="420.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">because</text>
+<text x="398.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">3%</text>
+<rect x="429" y="400" width="54" height="32" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><text x="456.0" y="420.0" text-anchor="middle" font-size="12" fill="#3C3489" font-weight="normal">it</text>
+<text x="456.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">15%</text>
+<rect x="487" y="400" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="514.0" y="420.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">was</text>
+<text x="514.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">3%</text>
+<rect x="545" y="400" width="54" height="32" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="572.0" y="420.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">too</text>
+<text x="572.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">4%</text>
+<rect x="603" y="400" width="54" height="32" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.8"/><text x="630.0" y="420.0" text-anchor="middle" font-size="12" fill="#633806" font-weight="bold">wide</text>
+<text x="630.0" y="450" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">query</text>
+<text x="340" y="505" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">Line thickness and % = how much the last word draws from each earlier word (illustrative)</text>
+</svg>

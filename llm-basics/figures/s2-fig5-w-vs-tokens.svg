@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="400" viewBox="0 0 920 400" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="920" height="400" fill="#fcfcfb"/>
+
+  <text x="32" y="40" font-size="18" font-weight="600" fill="#0b0b0b">Neither dimension of W counts tokens</text>
+  <text x="32" y="62" font-size="13" fill="#52514e">Token count is the free dimension of the other operand. W is [d_model in &#215; d_model out].</text>
+
+  <!-- X: token rows -->
+  <g font-size="11.5" fill="#52514e" text-anchor="end">
+    <text x="52" y="134">pos 0</text>
+    <text x="52" y="160">pos 1</text>
+    <text x="52" y="186">pos 2</text>
+  </g>
+  <g fill="#2a78d6">
+    <rect x="60" y="120" width="240" height="20" rx="3"/>
+    <rect x="60" y="146" width="240" height="20" rx="3"/>
+    <rect x="60" y="172" width="240" height="20" rx="3"/>
+  </g>
+  <text x="180" y="224" font-size="12.5" fill="#52514e" text-anchor="middle" font-family="ui-monospace, monospace">X [3 tokens &#215; 4096]</text>
+
+  <text x="330" y="162" font-size="18" fill="#0b0b0b" text-anchor="middle">&#215;</text>
+
+  <!-- W -->
+  <rect x="355" y="95" width="150" height="150" fill="#9ec5f4" rx="4"/>
+  <text x="430" y="175" font-size="13" font-weight="600" fill="#0b0b0b" text-anchor="middle" font-family="ui-monospace, monospace">W</text>
+  <text x="430" y="272" font-size="12" fill="#52514e" text-anchor="middle">one side (4096): matches one token&#8217;s floats</text>
+  <text x="430" y="290" font-size="12" fill="#52514e" text-anchor="middle">other side (4096): the output probes</text>
+
+  <text x="545" y="162" font-size="18" fill="#0b0b0b" text-anchor="middle">=</text>
+
+  <!-- Y: output rows -->
+  <g fill="#6da7ec">
+    <rect x="570" y="120" width="240" height="20" rx="3"/>
+    <rect x="570" y="146" width="240" height="20" rx="3"/>
+    <rect x="570" y="172" width="240" height="20" rx="3"/>
+  </g>
+  <text x="690" y="224" font-size="12.5" fill="#52514e" text-anchor="middle" font-family="ui-monospace, monospace">Y [3 tokens &#215; 4096]</text>
+
+  <line x1="32" y1="316" x2="888" y2="316" stroke="#e1e0d9" stroke-width="1"/>
+  <text x="32" y="346" font-size="14" fill="#0b0b0b">Row i of Y = W applied to row i of X. Same W for every position, <tspan font-weight="600">positions never mix here</tspan> &#8212;</text>
+  <text x="32" y="370" font-size="14" fill="#0b0b0b">cross-position interaction happens only in attention (Session 3). 1 token or 4,000: same W, more rows.</text>
+</svg>

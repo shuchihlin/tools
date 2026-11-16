@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="570" viewBox="0 0 920 570" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" xmlns:c2pa="http://c2pa.org/manifest">
+  <rect width="920" height="570" fill="#fcfcfb"/>
+
+  <!-- Title -->
+  <text x="32" y="40" font-size="18" font-weight="600" fill="#0b0b0b">A tensor is a raw number buffer plus shape metadata</text>
+  <text x="32" y="62" font-size="13" fill="#52514e">ML usage: just an n-dimensional array. dtype &#215; shape tells you exactly how many bytes it occupies.</text>
+
+  <!-- Rank 0: scalar -->
+  <g>
+    <rect x="70" y="150" width="20" height="20" fill="#2a78d6" rx="3"/>
+    <text x="80" y="272" font-size="13" font-weight="600" fill="#0b0b0b" text-anchor="middle">rank 0</text>
+    <text x="80" y="290" font-size="12" fill="#52514e" text-anchor="middle">scalar</text>
+    <text x="80" y="308" font-size="12" fill="#898781" text-anchor="middle" font-family="ui-monospace, monospace">[]</text>
+  </g>
+
+  <!-- Rank 1: vector -->
+  <g>
+    <g fill="#2a78d6">
+      <rect x="205" y="118" width="20" height="20" rx="3"/>
+      <rect x="205" y="140" width="20" height="20" rx="3"/>
+      <rect x="205" y="162" width="20" height="20" rx="3"/>
+      <rect x="205" y="184" width="20" height="20" rx="3"/>
+      <rect x="205" y="206" width="20" height="20" rx="3"/>
+    </g>
+    <text x="215" y="240" font-size="12" fill="#898781" text-anchor="middle">&#8942;</text>
+    <text x="215" y="272" font-size="13" font-weight="600" fill="#0b0b0b" text-anchor="middle">rank 1</text>
+    <text x="215" y="290" font-size="12" fill="#52514e" text-anchor="middle">vector</text>
+    <text x="215" y="308" font-size="12" fill="#898781" text-anchor="middle" font-family="ui-monospace, monospace">[4096]</text>
+  </g>
+
+  <!-- Rank 2: matrix -->
+  <g>
+    <g fill="#2a78d6">
+      <!-- 6 rows x 8 cols, 16px pitch, 14px cells -->
+      <g>
+        <rect x="360" y="120" width="14" height="14" rx="2"/><rect x="376" y="120" width="14" height="14" rx="2"/><rect x="392" y="120" width="14" height="14" rx="2"/><rect x="408" y="120" width="14" height="14" rx="2"/><rect x="424" y="120" width="14" height="14" rx="2"/><rect x="440" y="120" width="14" height="14" rx="2"/><rect x="456" y="120" width="14" height="14" rx="2"/><rect x="472" y="120" width="14" height="14" rx="2"/>
+        <rect x="360" y="136" width="14" height="14" rx="2"/><rect x="376" y="136" width="14" height="14" rx="2"/><rect x="392" y="136" width="14" height="14" rx="2"/><rect x="408" y="136" width="14" height="14" rx="2"/><rect x="424" y="136" width="14" height="14" rx="2"/><rect x="440" y="136" width="14" height="14" rx="2"/><rect x="456" y="136" width="14" height="14" rx="2"/><rect x="472" y="136" width="14" height="14" rx="2"/>
+        <rect x="360" y="152" width="14" height="14" rx="2"/><rect x="376" y="152" width="14" height="14" rx="2"/><rect x="392" y="152" width="14" height="14" rx="2"/><rect x="408" y="152" width="14" height="14" rx="2"/><rect x="424" y="152" width="14" height="14" rx="2"/><rect x="440" y="152" width="14" height="14" rx="2"/><rect x="456" y="152" width="14" height="14" rx="2"/><rect x="472" y="152" width="14" height="14" rx="2"/>
+        <rect x="360" y="168" width="14" height="14" rx="2"/><rect x="376" y="168" width="14" height="14" rx="2"/><rect x="392" y="168" width="14" height="14" rx="2"/><rect x="408" y="168" width="14" height="14" rx="2"/><rect x="424" y="168" width="14" height="14" rx="2"/><rect x="440" y="168" width="14" height="14" rx="2"/><rect x="456" y="168" width="14" height="14" rx="2"/><rect x="472" y="168" width="14" height="14" rx="2"/>
+        <rect x="360" y="184" width="14" height="14" rx="2"/><rect x="376" y="184" width="14" height="14" rx="2"/><rect x="392" y="184" width="14" height="14" rx="2"/><rect x="408" y="184" width="14" height="14" rx="2"/><rect x="424" y="184" width="14" height="14" rx="2"/><rect x="440" y="184" width="14" height="14" rx="2"/><rect x="456" y="184" width="14" height="14" rx="2"/><rect x="472" y="184" width="14" height="14" rx="2"/>
+        <rect x="360" y="200" width="14" height="14" rx="2"/><rect x="376" y="200" width="14" height="14" rx="2"/><rect x="392" y="200" width="14" height="14" rx="2"/><rect x="408" y="200" width="14" height="14" rx="2"/><rect x="424" y="200" width="14" height="14" rx="2"/><rect x="440" y="200" width="14" height="14" rx="2"/><rect x="456" y="200" width="14" height="14" rx="2"/><rect x="472" y="200" width="14" height="14" rx="2"/>
+      </g>
+    </g>
+    <text x="423" y="272" font-size="13" font-weight="600" fill="#0b0b0b" text-anchor="middle">rank 2</text>
+    <text x="423" y="290" font-size="12" fill="#52514e" text-anchor="middle">matrix &#8212; where nearly all weights live</text>
+    <text x="423" y="308" font-size="12" fill="#898781" text-anchor="middle" font-family="ui-monospace, monospace">[4096 &#215; 14336]</text>
+  </g>
+
+  <!-- Rank 3: stack of matrices -->
+  <g>
+    <g>
+      <rect x="650" y="140" width="112" height="80" fill="#9ec5f4" rx="3"/>
+      <rect x="662" y="128" width="112" height="80" fill="#6da7ec" rx="3"/>
+      <rect x="674" y="116" width="112" height="80" fill="#2a78d6" rx="3"/>
+    </g>
+    <text x="718" y="272" font-size="13" font-weight="600" fill="#0b0b0b" text-anchor="middle">rank 3</text>
+    <text x="718" y="290" font-size="12" fill="#52514e" text-anchor="middle">stack of matrices (e.g. batched)</text>
+    <text x="718" y="308" font-size="12" fill="#898781" text-anchor="middle" font-family="ui-monospace, monospace">[32 &#215; 4096 &#215; 4096]</text>
+  </g>
+
+  <!-- Panel B: safetensors -->
+  <text x="32" y="362" font-size="15" font-weight="600" fill="#0b0b0b">The safetensors file from Session 1 is exactly this: a manifest + concatenated tensor buffers</text>
+
+  <g font-size="12">
+    <rect x="32"  y="380" width="130" height="52" fill="#e1e0d9" rx="4"/>
+    <text x="97" y="410" fill="#0b0b0b" text-anchor="middle" font-weight="600">JSON header</text>
+
+    <rect x="164" y="380" width="136" height="52" fill="#9ec5f4" rx="4"/>
+    <text x="232" y="410" fill="#0b0b0b" text-anchor="middle" font-family="ui-monospace, monospace">embed.weight</text>
+
+    <rect x="302" y="380" width="118" height="52" fill="#9ec5f4" rx="4"/>
+    <text x="361" y="410" fill="#0b0b0b" text-anchor="middle" font-family="ui-monospace, monospace">q_proj</text>
+
+    <rect x="422" y="380" width="118" height="52" fill="#9ec5f4" rx="4"/>
+    <text x="481" y="410" fill="#0b0b0b" text-anchor="middle" font-family="ui-monospace, monospace">k_proj</text>
+
+    <rect x="542" y="380" width="98" height="52" fill="#f0efec" rx="4"/>
+    <text x="591" y="410" fill="#898781" text-anchor="middle">&#8230; &#215;284 &#8230;</text>
+
+    <rect x="642" y="380" width="138" height="52" fill="#9ec5f4" rx="4"/>
+    <text x="711" y="410" fill="#0b0b0b" text-anchor="middle" font-family="ui-monospace, monospace">down_proj</text>
+
+    <rect x="782" y="380" width="106" height="52" fill="#9ec5f4" rx="4"/>
+    <text x="835" y="410" fill="#0b0b0b" text-anchor="middle" font-family="ui-monospace, monospace">lm_head</text>
+  </g>
+
+  <text x="32" y="472" font-size="12.5" fill="#52514e" font-family="ui-monospace, monospace">"layers.0.self_attn.q_proj.weight": { "dtype": "BF16", "shape": [4096, 4096], "data_offsets": [a, a+33554432] }</text>
+
+  <text x="32" y="506" font-size="13" fill="#52514e">Byte length is computable from the header alone: 4096 &#215; 4096 &#215; 2 B = 33,554,432 &#8212; which is why loaders</text>
+  <text x="32" y="524" font-size="13" fill="#52514e">can mmap the file zero-copy. Llama 3 8B is ~291 named tensors; almost every parameter sits in a rank-2 one.</text>
+<metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo5OTcyNjY4MS03OWNkLTQwYWUtODJhMi0xZDVjN2U1YjU2YzIAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaJ78TlwHf9wWs7jm0bjNlV8AAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDowNjg0NmIxNC0wMmZmLTQwYjYtYjAzZC02M2UyZjFhMDE2ZDFscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoOxR1cSCfm0KuZHvQq5unEwAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggIHA/BNR70zaO8gLRxGaf5jToPD40km8wbS1NO11LKyCkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaKPWJDOohMvCRQztczz68j8AAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIHJ5w/NsCbHy65shI9GiDKzpqjl8LxZ2dbIEjrelIyCBZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GR4LZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjk5NzI2NjgxLTc5Y2QtNDBhZS04MmEyLTFkNWM3ZTViNTZjMi9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjA5NjVkMDllLWQ0NzgtNDJlMC05YTI4LTUzNTk0NzhkODhkOXJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCAgcD8E1HvTNo7yAtHEZp/mNOg8PjSSbzBtLU07XUsrIKJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFgglt+SCUjriKomw99CjwKFUxCtHKNt7v2YyjwKDgrGlTuiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggE5tw6vt2VE6DNhnk6m+lRpjP+Z2DgAFHAfwusKvFQk50Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQBKqfE5U2mwDHZKE4ymyBstx7EYhBQc5+quw26Yis6PnoOmipchhsINOFXNQ7/cSriuPcwxcNxZRRE9Y9K+0l1g=</c2pa:manifest></metadata></svg>

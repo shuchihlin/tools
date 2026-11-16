@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1090" viewBox="0 0 760 1090" font-family="Segoe UI, Arial, sans-serif" xmlns:c2pa="http://c2pa.org/manifest">
+  <style>
+    .title { font-size: 17px; font-weight: 600; fill: #1a1a2e; }
+    .sub   { font-size: 12px; fill: #555; }
+    .lbl   { font-size: 12px; fill: #1a1a2e; }
+    .small { font-size: 11px; fill: #444; }
+    .tiny  { font-size: 10px; fill: #555; }
+    .mono  { font-family: Consolas, monospace; font-size: 12.5px; fill: #1a1a2e; }
+    .monosm{ font-family: Consolas, monospace; font-size: 11px; fill: #444; }
+    .hdr   { font-size: 13px; font-weight: 600; fill: #1a1a2e; }
+  </style>
+  <rect width="760" height="1090" fill="#ffffff"/>
+
+  <text x="20" y="30" class="title">Where the KV cache is made, where it lives, and what "batch" means for your request</text>
+
+  <!-- Panel A: where in the layer -->
+  <text x="20" y="66" class="hdr">A — Generated inside every layer, at the K and V projections (32 writes per position)</text>
+
+  <rect x="40" y="82" width="680" height="150" rx="8" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="54" y="104" class="monosm">one layer, one position:</text>
+
+  <!-- x in -->
+  <rect x="60" y="120" width="46" height="26" rx="3" fill="#0b6e99" opacity="0.2" stroke="#0b6e99"/>
+  <text x="70" y="138" class="mono">x</text>
+  <line x1="108" y1="133" x2="140" y2="133" stroke="#555"/>
+
+  <!-- Q K V -->
+  <rect x="142" y="98" width="70" height="24" rx="3" fill="#eef3f7" stroke="#c9d4dd"/>
+  <text x="158" y="115" class="mono">W_q·x</text>
+  <rect x="142" y="126" width="70" height="24" rx="3" fill="#f0f7f0" stroke="#4a8a4a"/>
+  <text x="158" y="143" class="mono">W_k·x</text>
+  <rect x="142" y="154" width="70" height="24" rx="3" fill="#f0f7f0" stroke="#4a8a4a"/>
+  <text x="158" y="171" class="mono">W_v·x</text>
+
+  <!-- arrows to cache -->
+  <line x1="214" y1="138" x2="262" y2="138" stroke="#4a8a4a" stroke-width="1.6"/>
+  <polygon points="262,133 272,138 262,143" fill="#4a8a4a"/>
+  <line x1="214" y1="166" x2="262" y2="150" stroke="#4a8a4a" stroke-width="1.6"/>
+
+  <rect x="276" y="112" width="150" height="56" rx="4" fill="#4a8a4a" opacity="0.15" stroke="#4a8a4a"/>
+  <text x="288" y="134" class="mono">KV cache</text>
+  <text x="288" y="154" class="monosm">append K,V for</text>
+  <text x="288" y="166" class="monosm">this position</text>
+
+  <!-- attention core -->
+  <line x1="430" y1="140" x2="466" y2="140" stroke="#555"/>
+  <polygon points="466,135 476,140 466,145" fill="#555"/>
+  <rect x="480" y="112" width="130" height="56" rx="4" fill="#fdf3e7" stroke="#d9b98a"/>
+  <text x="492" y="134" class="mono">attention core</text>
+  <text x="492" y="154" class="monosm">Q · all cached K</text>
+
+  <text x="54" y="200" class="small">Q is used once and thrown away. K and V are KEPT — every future token will need to attend over this position.</text>
+  <text x="54" y="218" class="small">32 layers × (1 K + 1 V) = 64 vectors written per position. Prefill writes 30 positions' worth; each decode step appends 1.</text>
+
+  <!-- Panel B: size math -->
+  <text x="20" y="266" class="hdr">B — Size: 128 KB per token for Llama 3 8B</text>
+  <rect x="40" y="282" width="680" height="106" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="306" class="mono">per token = 32 layers × 2 (K,V) × 1024 dims × 2 bytes (BF16) = 131,072 B = 128 KB</text>
+  <text x="56" y="332" class="mono">your request  =  75 tokens (30 prompt + 45 generated) × 128 KB  =  9.4 MB</text>
+  <text x="56" y="358" class="small">9.4 MB against 15 GB of weights — 0.06% of the pass's traffic. For a short chat turn the KV cache is a rounding error.</text>
+  <text x="56" y="376" class="small">K,V are only 1024 wide because of GQA (grouped-query attention): 32 heads share 8 K,V sets. Without it: 512 KB/token, 4× more.</text>
+
+  <!-- Panel C: HBM map -->
+  <text x="20" y="424" class="hdr">C — Placed in HBM, alongside the weights — not on-chip</text>
+
+  <text x="40" y="450" class="small">your request alone (80 GB card):</text>
+  <rect x="40" y="458" width="680" height="34" rx="3" fill="#f7fafc" stroke="#c9d4dd"/>
+  <rect x="40" y="458" width="136" height="34" fill="#0b6e99" opacity="0.35"/>
+  <text x="66" y="480" class="monosm" fill="#fff">weights 16 GB</text>
+  <rect x="176" y="458" width="2" height="34" fill="#4a8a4a"/>
+  <text x="186" y="480" class="monosm">↑ your KV: 9.4 MB (this sliver)         — 64 GB free</text>
+
+  <text x="40" y="524" class="small">the same card at its limit, serving 238 users at 2048-token contexts:</text>
+  <rect x="40" y="532" width="680" height="34" rx="3" fill="#f7fafc" stroke="#c9d4dd"/>
+  <rect x="40" y="532" width="136" height="34" fill="#0b6e99" opacity="0.35"/>
+  <text x="66" y="554" class="monosm" fill="#fff">weights 16 GB</text>
+  <rect x="176" y="532" width="544" height="34" fill="#4a8a4a" opacity="0.35"/>
+  <text x="330" y="554" class="monosm">KV caches: 238 × 0.27 GB = 64 GB</text>
+  <text x="690" y="554" class="tiny">80/80</text>
+
+  <rect x="40" y="586" width="680" height="76" rx="6" fill="#fdf3e7" stroke="#d9b98a"/>
+  <text x="56" y="608" class="small" font-weight="600">The weights are fixed at 16 GB; the KV caches scale with batch × context — and they are what fills the card.</text>
+  <text x="56" y="630" class="mono">max batch at 2048 ctx = (80 − 16) GB ÷ 0.27 GB ≈ 238 requests   (without GQA ≈ 60)</text>
+  <text x="56" y="650" class="small">That ceiling — not compute — is why the batch you're sharing has a limit; longer contexts lower it further.</text>
+
+  <!-- Panel D: batching -->
+  <text x="20" y="700" class="hdr">D — "Batch" for your request means OTHER USERS, never your own tokens</text>
+
+  <rect x="40" y="716" width="330" height="150" rx="6" fill="#eef5f9" stroke="#0b6e99"/>
+  <text x="56" y="739" class="lbl" font-weight="600">Not batchable: your own 45 tokens</text>
+  <text x="56" y="760" class="small">token 2 needs token 1's value as input.</text>
+  <text x="56" y="778" class="small">Serial by data dependency — no batch</text>
+  <text x="56" y="796" class="small">of any size changes this.</text>
+  <text x="56" y="822" class="small" font-weight="600">Your pace is ~4.5 ms per token regardless.</text>
+  <text x="56" y="842" class="small">Batching does NOT speed up your answer.</text>
+
+  <rect x="390" y="716" width="330" height="150" rx="6" fill="#f0f7f0" stroke="#4a8a4a"/>
+  <text x="406" y="739" class="lbl" font-weight="600">Batchable: strangers' requests</text>
+  <text x="406" y="760" class="small">At each 4.5 ms step the server gathers</text>
+  <text x="406" y="778" class="small">every active request's next position into</text>
+  <text x="406" y="796" class="small">one [B × 4096] matrix — one weight</text>
+  <text x="406" y="814" class="small">stream serves all B of you.</text>
+  <text x="406" y="842" class="small" font-weight="600">This is what makes serving economical.</text>
+
+  <!-- continuous batching strip -->
+  <rect x="40" y="886" width="680" height="112" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="908" class="hdr">Continuous batching — the batch is re-formed every step</text>
+  <g>
+    <text x="56" y="936" class="monosm">step t   :  [you, userB, userC, userD]        4 positions</text>
+    <text x="56" y="956" class="monosm">step t+1 :  [you, userB,        userD, userE]  userC finished, userE joined</text>
+    <text x="56" y="976" class="monosm">step t+2 :  [you,        userD, userE, userF]  ← and a prefill can ride along too</text>
+  </g>
+
+  <text x="40" y="1026" class="small">You join a batch mid-flight and leave when your end-of-sequence token is sampled. Composition changes every 4.5 ms.</text>
+  <text x="40" y="1046" class="small">Running the same model locally (one user, llama.cpp): batch = 1 genuinely — intensity 1, the worst case, all 4.5 ms yours.</text>
+  <text x="40" y="1070" class="small">Storage detail: servers keep each cache in fixed-size blocks (PagedAttention) — virtual-memory paging, to avoid fragmentation.</text>
+<metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYToxMmRmNzMyNy02N2ViLTRmMTMtYjVjMi1jMDU3ZTU1MWQwYmUAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaMmH/ZV/E4w0kcmMXni9iiAAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDphZmMzNDg0My01N2ZmLTQ4NmEtYjRjNi1iYmNjNGRmMTFhNjFscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNojI3liFLLlWHQL8p+mAlRjgAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggoLbHZpNNNiwf9r/S6+1C3ecdK2PXHBqdQmyTBjISHGOkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaJ7HM4xSxQzYnFBJq1wLhWsAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIHuXcbv52JG2pBMSCutxAsyf3C9yLcR9NE9SfjTMzOF2ZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GR9zZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjEyZGY3MzI3LTY3ZWItNGYxMy1iNWMyLWMwNTdlNTUxZDBiZS9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjU0ZmZkZGU1LWYwNjYtNGRhMi1iY2JkLTU5MzE3YmQyOTYwNHJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCCgtsdmk002LB/2v9Lr7ULd5x0rY9ccGp1CbJMGMhIcY6JjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFgglbc2srw5xZzeENJjCAGC418dbeDnHMkNc5NmsYXPvzyiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggeLr3jM2DFS/W8qkAC1ZkV36GGJhjwXn+4VODIZX9w390Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQEr5bONHFocSFlIpLaAGMVOThJvXatx2+CqXOpKkBrk0aJzykW/SrgZsMiuVdMTzEWN1G8NJI4NY5iyhb2P94OM=</c2pa:manifest></metadata></svg>

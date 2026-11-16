@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1140" viewBox="0 0 760 1140" font-family="Segoe UI, Arial, sans-serif">
+  <style>
+    .title { font-size: 17px; font-weight: 600; fill: #1a1a2e; }
+    .sub   { font-size: 12px; fill: #555; }
+    .small { font-size: 11px; fill: #444; }
+    .tiny  { font-size: 10px; fill: #555; }
+    .mono  { font-family: Consolas, monospace; font-size: 12.5px; fill: #1a1a2e; }
+    .monosm{ font-family: Consolas, monospace; font-size: 10.5px; fill: #444; }
+    .hdr   { font-size: 13px; font-weight: 600; fill: #1a1a2e; }
+  </style>
+  <rect width="760" height="1140" fill="#ffffff"/>
+
+  <text x="20" y="30" class="title">Quantization mechanics: the map, the error bound, and where it breaks</text>
+
+  <!-- ===== A: the mapping ===== -->
+  <text x="20" y="66" class="hdr">A — Symmetric INT8: lay 255 evenly spaced levels across [−max|w|, +max|w|]</text>
+
+  <rect x="40" y="82" width="680" height="96" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="106" class="mono">s = max|w| / 127          (the SCALE — one float kept per tensor/channel/group)</text>
+  <text x="56" y="128" class="mono">q = round(w / s)          (store this: one signed byte, −127…127)</text>
+  <text x="56" y="150" class="mono">ŵ = s · q                 (DEQUANTIZE back to float when needed)</text>
+  <text x="56" y="170" class="small">Error is bounded by half a step: |w − ŵ| ≤ s/2. Always. No exceptions, no accumulation within one weight.</text>
+
+  <!-- number line -->
+  <line x1="70" y1="222" x2="690" y2="222" stroke="#999" stroke-width="1.5"/>
+  <g stroke="#0b6e99" stroke-width="1">
+    <line x1="70" y1="214" x2="70" y2="230"/><line x1="148" y1="216" x2="148" y2="228"/>
+    <line x1="226" y1="216" x2="226" y2="228"/><line x1="304" y1="216" x2="304" y2="228"/>
+    <line x1="380" y1="212" x2="380" y2="232"/><line x1="458" y1="216" x2="458" y2="228"/>
+    <line x1="536" y1="216" x2="536" y2="228"/><line x1="614" y1="216" x2="614" y2="228"/>
+    <line x1="690" y1="214" x2="690" y2="230"/>
+  </g>
+  <text x="46" y="248" class="monosm">−0.254</text>
+  <text x="364" y="248" class="monosm">0</text>
+  <text x="666" y="248" class="monosm">+0.254</text>
+  <text x="52" y="206" class="monosm">q=−127</text>
+  <text x="366" y="206" class="monosm">0</text>
+  <text x="664" y="206" class="monosm">+127</text>
+  <text x="240" y="268" class="small">255 levels, step s = 0.254/127 = 0.0020 — the grid any weight must snap to</text>
+
+  <!-- ===== B: worked example ===== -->
+  <text x="20" y="308" class="hdr">B — One real weight row, quantized and back (8 of a 4096-wide row)</text>
+
+  <rect x="40" y="322" width="680" height="152" rx="6" fill="#ffffff" stroke="#c9d4dd"/>
+  <text x="54" y="344" class="monosm">w   =  0.0312  -0.1183   0.2540  -0.0094   0.0865  -0.2013   0.1421  -0.0627</text>
+  <line x1="54" y1="352" x2="706" y2="352" stroke="#e4eaef"/>
+  <text x="54" y="372" class="monosm">w/s =  15.60   -59.15   127.00   -4.70    43.25   -100.65   71.05   -31.35</text>
+  <text x="54" y="394" class="monosm">q   =     16      -59      127      -5        43      -101      71      -31   ← stored bytes</text>
+  <line x1="54" y1="402" x2="706" y2="402" stroke="#e4eaef"/>
+  <text x="54" y="422" class="monosm">ŵ   =  0.0320  -0.1180   0.2540  -0.0100   0.0860  -0.2020   0.1420  -0.0620</text>
+  <text x="54" y="444" class="monosm">err = +0.0008 +0.0003   0.0000  -0.0006  -0.0005  -0.0007  -0.0001  +0.0007</text>
+  <text x="54" y="466" class="small">max |err| = 0.0008 ≤ s/2 = 0.0010 ✓   —  worst case 0.3% of the row's range. 16 bytes became 8 bytes + one scale.</text>
+
+  <!-- ===== C: why it works ===== -->
+  <text x="20" y="508" class="hdr">C — Why a 0.3% perturbation on every weight barely moves the output</text>
+
+  <rect x="40" y="522" width="330" height="168" rx="6" fill="#eef5f9" stroke="#0b6e99"/>
+  <text x="56" y="545" class="small" font-weight="600">1. Precision for integrating ≠ for reporting</text>
+  <text x="56" y="564" class="small">FP16's 10 mantissa bits were needed to</text>
+  <text x="56" y="581" class="small">ACCUMULATE gradient updates of ~1e-5</text>
+  <text x="56" y="598" class="small">relative, over trillions of steps. Inference</text>
+  <text x="56" y="615" class="small">just reads the finished value.</text>
+  <text x="56" y="640" class="small">EE framing: a high-resolution ADC to</text>
+  <text x="56" y="657" class="small">integrate a drifting signal; far fewer bits</text>
+  <text x="56" y="674" class="small">to report the settled result.</text>
+
+  <rect x="390" y="522" width="330" height="168" rx="6" fill="#f0f7f0" stroke="#4a8a4a"/>
+  <text x="406" y="545" class="small" font-weight="600">2. The error is INCOHERENT</text>
+  <text x="406" y="564" class="small">y = Σ wᵢxᵢ over 4096 terms. Rounding</text>
+  <text x="406" y="581" class="small">errors δᵢ are independent and zero-mean,</text>
+  <text x="406" y="598" class="small">so they partly cancel (grow as √n) while</text>
+  <text x="406" y="615" class="small">the signal grows as √n too —</text>
+  <text x="406" y="632" class="small">output relative error ≈ weight relative</text>
+  <text x="406" y="649" class="small">error. It does NOT amplify.</text>
+  <text x="406" y="674" class="small">Across 32 layers it compounds only ~√32.</text>
+
+  <rect x="40" y="702" width="680" height="44" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="722" class="small">3. Trained networks sit in flat regions of the loss surface and were trained amid noise (SGD, dropout, BF16</text>
+  <text x="56" y="738" class="small">arithmetic). Small weight perturbations are the condition they were optimized under, not a novel insult.</text>
+
+  <!-- ===== D: outliers ===== -->
+  <text x="20" y="786" class="hdr">D — Where it breaks: OUTLIERS waste the level budget</text>
+
+  <!-- well-behaved -->
+  <text x="56" y="812" class="small" font-weight="600">Weights: well-behaved, bell-shaped</text>
+  <g fill="#0b6e99" opacity="0.5">
+    <rect x="60" y="880" width="12" height="6"/><rect x="74" y="872" width="12" height="14"/>
+    <rect x="88" y="856" width="12" height="30"/><rect x="102" y="838" width="12" height="48"/>
+    <rect x="116" y="828" width="12" height="58"/><rect x="130" y="838" width="12" height="48"/>
+    <rect x="144" y="856" width="12" height="30"/><rect x="158" y="872" width="12" height="14"/>
+    <rect x="172" y="880" width="12" height="6"/>
+  </g>
+  <line x1="52" y1="886" x2="196" y2="886" stroke="#999"/>
+  <text x="56" y="904" class="small">range ≈ ±0.25 → all 255 levels used</text>
+  <text x="56" y="920" class="small" fill="#0b6e99">INT8 here is near-lossless.</text>
+
+  <!-- outlier case -->
+  <text x="300" y="812" class="small" font-weight="600">Activations above ~6.7B params: outlier features</text>
+  <g fill="#b5651d" opacity="0.5">
+    <rect x="310" y="856" width="8" height="30"/><rect x="320" y="838" width="8" height="48"/>
+    <rect x="330" y="828" width="8" height="58"/><rect x="340" y="838" width="8" height="48"/>
+    <rect x="350" y="856" width="8" height="30"/>
+  </g>
+  <rect x="670" y="862" width="8" height="24" fill="#c0392b"/>
+  <line x1="302" y1="886" x2="700" y2="886" stroke="#999"/>
+  <text x="620" y="854" class="tiny" fill="#c0392b">~0.1% of dims,</text>
+  <text x="620" y="842" class="tiny" fill="#c0392b">20–100× larger</text>
+  <text x="300" y="904" class="small">one per-tensor scale is set by the far-right spike →</text>
+  <text x="300" y="920" class="small" fill="#c0392b">the real mass is crushed into ~3 of 255 levels.</text>
+
+  <rect x="40" y="938" width="680" height="88" rx="6" fill="#fdf3e7" stroke="#d9b98a"/>
+  <text x="56" y="958" class="small" font-weight="600">Mitigations — all of them are "stop sharing one scale across things with different magnitudes":</text>
+  <text x="56" y="978" class="small">• finer granularity: per-channel, or per-GROUP (64 or 128 weights share a scale) — the standard fix for weights</text>
+  <text x="56" y="996" class="small">• mixed decomposition (LLM.int8): keep the ~0.1% outlier dimensions in FP16, everything else INT8</text>
+  <text x="56" y="1014" class="small">• SmoothQuant: migrate the scale difficulty out of activations into weights, where it is tolerable</text>
+
+  <rect x="40" y="1038" width="680" height="86" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="1058" class="small" font-weight="600">Smarter rounding — not every weight deserves equal treatment:</text>
+  <text x="56" y="1078" class="small">• GPTQ: round layer by layer, minimizing the layer's OUTPUT error (second-order), not the weight error</text>
+  <text x="56" y="1096" class="small">• AWQ (activation-aware): protect the weights that multiply large activations; they matter more</text>
+  <text x="56" y="1114" class="small">• NF4 (NormalFloat-4): place the 16 levels at a normal distribution's quantiles, not uniformly — fits the shape</text>
+</svg>

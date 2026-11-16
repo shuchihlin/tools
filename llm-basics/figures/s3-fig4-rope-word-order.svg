@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 350" width="680" height="350" font-family="Helvetica, Arial, sans-serif"><title>S3 fig4: RoPE word order</title><rect width="680" height="350" fill="#ffffff"/>
+<text x="40" y="84" text-anchor="start" font-size="14" fill="#444441" font-weight="bold">Sentence 1</text>
+<text x="40" y="224" text-anchor="start" font-size="14" fill="#444441" font-weight="bold">Sentence 2</text>
+<circle cx="180" cy="80" r="28" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><line x1="180" y1="80" x2="180.0" y2="56.0" stroke="#EF9F27" stroke-width="2.5" stroke-linecap="round"/>
+<text x="180" y="128" text-anchor="middle" font-size="14" fill="#444441" font-weight="bold">dog</text>
+<circle cx="340" cy="80" r="28" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><line x1="340" y1="80" x2="355.4" y2="61.6" stroke="#EF9F27" stroke-width="2.5" stroke-linecap="round"/>
+<text x="340" y="128" text-anchor="middle" font-size="14" fill="#444441" font-weight="normal">bites</text>
+<circle cx="500" cy="80" r="28" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/><line x1="500" y1="80" x2="523.6" y2="75.8" stroke="#EF9F27" stroke-width="2.5" stroke-linecap="round"/>
+<text x="500" y="128" text-anchor="middle" font-size="14" fill="#444441" font-weight="bold">man</text>
+<circle cx="180" cy="220" r="28" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/><line x1="180" y1="220" x2="180.0" y2="196.0" stroke="#EF9F27" stroke-width="2.5" stroke-linecap="round"/>
+<text x="180" y="268" text-anchor="middle" font-size="14" fill="#444441" font-weight="bold">man</text>
+<circle cx="340" cy="220" r="28" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><line x1="340" y1="220" x2="355.4" y2="201.6" stroke="#EF9F27" stroke-width="2.5" stroke-linecap="round"/>
+<text x="340" y="268" text-anchor="middle" font-size="14" fill="#444441" font-weight="normal">bites</text>
+<circle cx="500" cy="220" r="28" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><line x1="500" y1="220" x2="523.6" y2="215.8" stroke="#EF9F27" stroke-width="2.5" stroke-linecap="round"/>
+<text x="500" y="268" text-anchor="middle" font-size="14" fill="#444441" font-weight="bold">dog</text>
+<text x="340" y="154" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">position 0 = 0°, position 1 = 40°, position 2 = 80°: dog sits 80° behind man</text>
+<text x="340" y="294" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">same words, swapped seats: now dog sits 80° ahead of man</text>
+<text x="340" y="330" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">The match score sees the angle gap, so the two sentences no longer look alike</text>
+</svg>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 420" width="680" height="420" font-family="Helvetica, Arial, sans-serif"><title>S3 fig3: three attention heads</title><rect width="680" height="420" fill="#ffffff"/>
+<text x="40" y="35" text-anchor="start" font-size="13" fill="#444441" font-weight="bold">Head A asks: who is being described?</text>
+<path d="M612 110 Q 340.0 18 68 110" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 110 Q 374.0 28 136 110" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="4.5" opacity="1.00"/>
+<path d="M612 110 Q 408.0 38 204 110" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.31"/>
+<path d="M612 110 Q 442.0 48 272 110" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 110 Q 476.0 58 340 110" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="1" opacity="0.35"/>
+<path d="M612 110 Q 510.0 68 408 110" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 110 Q 544.0 78 476 110" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="3" opacity="0.75"/>
+<path d="M612 110 Q 578.0 88 544 110" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.31"/>
+<rect x="38" y="110" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="68.0" y="129.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">The</text>
+<rect x="106" y="110" width="60" height="30" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><text x="136.0" y="129.0" text-anchor="middle" font-size="12" fill="#3C3489" font-weight="normal">animal</text>
+<rect x="174" y="110" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="204.0" y="129.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">crossed</text>
+<rect x="242" y="110" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="272.0" y="129.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">the</text>
+<rect x="310" y="110" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="340.0" y="129.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">street</text>
+<rect x="378" y="110" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="408.0" y="129.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">because</text>
+<rect x="446" y="110" width="60" height="30" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><text x="476.0" y="129.0" text-anchor="middle" font-size="12" fill="#3C3489" font-weight="normal">it</text>
+<rect x="514" y="110" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="544.0" y="129.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">was</text>
+<rect x="582" y="110" width="60" height="30" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.8"/><text x="612.0" y="129.0" text-anchor="middle" font-size="12" fill="#633806" font-weight="bold">tired</text>
+<text x="40" y="155" text-anchor="start" font-size="13" fill="#444441" font-weight="bold">Head B asks: what word came just before me?</text>
+<path d="M612 230 Q 340.0 138 68 230" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 230 Q 374.0 148 136 230" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 230 Q 408.0 158 204 230" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 230 Q 442.0 168 272 230" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 230 Q 476.0 178 340 230" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.27"/>
+<path d="M612 230 Q 510.0 188 408 230" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 230 Q 544.0 198 476 230" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.29"/>
+<path d="M612 230 Q 578.0 208 544 230" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="5" opacity="1.00"/>
+<rect x="38" y="230" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="68.0" y="249.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">The</text>
+<rect x="106" y="230" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="136.0" y="249.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">animal</text>
+<rect x="174" y="230" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="204.0" y="249.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">crossed</text>
+<rect x="242" y="230" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="272.0" y="249.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">the</text>
+<rect x="310" y="230" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="340.0" y="249.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">street</text>
+<rect x="378" y="230" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="408.0" y="249.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">because</text>
+<rect x="446" y="230" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="476.0" y="249.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">it</text>
+<rect x="514" y="230" width="60" height="30" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><text x="544.0" y="249.0" text-anchor="middle" font-size="12" fill="#3C3489" font-weight="normal">was</text>
+<rect x="582" y="230" width="60" height="30" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.8"/><text x="612.0" y="249.0" text-anchor="middle" font-size="12" fill="#633806" font-weight="bold">tired</text>
+<text x="40" y="275" text-anchor="start" font-size="13" fill="#444441" font-weight="bold">Head C asks: what action happened?</text>
+<path d="M612 350 Q 340.0 258 68 350" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 350 Q 374.0 268 136 350" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.31"/>
+<path d="M612 350 Q 408.0 278 204 350" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="4.5" opacity="1.00"/>
+<path d="M612 350 Q 442.0 288 272 350" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 350 Q 476.0 298 340 350" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="1.5" opacity="0.45"/>
+<path d="M612 350 Q 510.0 308 408 350" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.27"/>
+<path d="M612 350 Q 544.0 318 476 350" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.25"/>
+<path d="M612 350 Q 578.0 328 544 350" fill="none" stroke="#EF9F27" stroke-linecap="round" stroke-width="0.8" opacity="0.29"/>
+<rect x="38" y="350" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="68.0" y="369.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">The</text>
+<rect x="106" y="350" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="136.0" y="369.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">animal</text>
+<rect x="174" y="350" width="60" height="30" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.8"/><text x="204.0" y="369.0" text-anchor="middle" font-size="12" fill="#3C3489" font-weight="normal">crossed</text>
+<rect x="242" y="350" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="272.0" y="369.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">the</text>
+<rect x="310" y="350" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="340.0" y="369.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">street</text>
+<rect x="378" y="350" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="408.0" y="369.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">because</text>
+<rect x="446" y="350" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="476.0" y="369.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">it</text>
+<rect x="514" y="350" width="60" height="30" rx="6" fill="#F1EFE8" stroke="#888780" stroke-width="0.8"/><text x="544.0" y="369.0" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">was</text>
+<rect x="582" y="350" width="60" height="30" rx="6" fill="#FAEEDA" stroke="#BA7517" stroke-width="0.8"/><text x="612.0" y="369.0" text-anchor="middle" font-size="12" fill="#633806" font-weight="bold">tired</text>
+<text x="340" y="405" text-anchor="middle" font-size="12" fill="#444441" font-weight="normal">Same word, same moment: each head draws from a different place (labels illustrative)</text>
+</svg>

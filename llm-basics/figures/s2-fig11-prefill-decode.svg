@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1010" viewBox="0 0 760 1010" font-family="Segoe UI, Arial, sans-serif" xmlns:c2pa="http://c2pa.org/manifest">
+  <style>
+    .title { font-size: 17px; font-weight: 600; fill: #1a1a2e; }
+    .sub   { font-size: 12px; fill: #555; }
+    .lbl   { font-size: 12px; fill: #1a1a2e; }
+    .small { font-size: 11px; fill: #444; }
+    .tiny  { font-size: 10px; fill: #555; }
+    .mono  { font-family: Consolas, monospace; font-size: 12.5px; fill: #1a1a2e; }
+    .monosm{ font-family: Consolas, monospace; font-size: 11px; fill: #444; }
+    .hdr   { font-size: 13px; font-weight: 600; fill: #1a1a2e; }
+  </style>
+  <rect width="760" height="1010" fill="#ffffff"/>
+
+  <text x="20" y="30" class="title">Panel A — One request, one wall clock: 2048-token prompt → 2048-token answer (8B, one H100)</text>
+  <text x="20" y="50" class="sub">Same weights, same GPU. The only difference is how many token-positions ride along with each weight fetch.</text>
+
+  <!-- timeline bar -->
+  <rect x="40" y="75" width="26" height="46" fill="#b5651d" opacity="0.75"/>
+  <rect x="66" y="75" width="654" height="46" fill="#0b6e99" opacity="0.30"/>
+  <line x1="40" y1="75" x2="40" y2="140" stroke="#555"/>
+  <line x1="66" y1="75" x2="66" y2="140" stroke="#555"/>
+  <line x1="720" y1="75" x2="720" y2="140" stroke="#555"/>
+  <text x="36" y="155" class="monosm">0 ms</text>
+  <text x="46" y="171" class="monosm">↑ TTFT ≈ 31–36 ms</text>
+  <text x="690" y="155" class="monosm">9.2 s</text>
+
+  <text x="44" y="66" class="tiny" fill="#b5651d">PREFILL</text>
+  <text x="360" y="66" class="tiny" fill="#0b6e99">DECODE — 2048 sequential passes, 4.5 ms each</text>
+  <text x="80" y="103" class="small" fill="#1a1a2e">one pass, all 2048 prompt positions together  →  then: pass, pass, pass, pass, … (one token each)</text>
+
+  <text x="40" y="196" class="small">Prefill is ~0.3% of the wall clock and does 50% of the token-work. The user sees a fast start and a slow drip.</text>
+
+  <!-- ===== Panel B: the two passes side by side ===== -->
+  <line x1="20" y1="215" x2="740" y2="215" stroke="#ddd"/>
+  <text x="20" y="245" class="title">Panel B — Why: the weight fetch is amortized over n positions, then over 1</text>
+
+  <!-- prefill box -->
+  <rect x="40" y="265" width="330" height="290" rx="8" fill="#fdf3e7" stroke="#d9b98a"/>
+  <text x="56" y="290" class="hdr">PREFILL — prompt already exists</text>
+
+  <!-- stacked positions -->
+  <g>
+    <rect x="58" y="305" width="120" height="14" fill="#b5651d" opacity="0.55"/>
+    <rect x="58" y="322" width="120" height="14" fill="#b5651d" opacity="0.55"/>
+    <rect x="58" y="339" width="120" height="14" fill="#b5651d" opacity="0.55"/>
+    <text x="62" y="368" class="monosm">⋮ 2048 rows</text>
+    <rect x="58" y="374" width="120" height="14" fill="#b5651d" opacity="0.55"/>
+    <text x="186" y="345" class="mono">X = [2048 × 4096]</text>
+  </g>
+  <text x="58" y="410" class="small">ONE fetch of W  →  used 2048 times</text>
+
+  <rect x="58" y="422" width="294" height="118" rx="5" fill="#ffffff" stroke="#d9b98a"/>
+  <text x="70" y="443" class="mono">FLOPs = 2P × 2048 = 31 TFLOPs</text>
+  <text x="70" y="463" class="mono">bytes = 15 GB          (fetched once)</text>
+  <text x="70" y="483" class="mono">intensity = 2048 FLOPs/byte</text>
+  <text x="70" y="505" class="small" font-weight="600">→ COMPUTE-bound (ridge ≈ 295)</text>
+  <text x="70" y="525" class="mono">31 TFLOPs ÷ 989 TFLOP/s ≈ 31 ms</text>
+
+  <!-- decode box -->
+  <rect x="395" y="265" width="330" height="290" rx="8" fill="#eef5f9" stroke="#0b6e99"/>
+  <text x="411" y="290" class="hdr">DECODE — next token does not exist yet</text>
+
+  <g>
+    <rect x="413" y="305" width="120" height="14" fill="#0b6e99" opacity="0.55"/>
+    <text x="541" y="317" class="mono">X = [1 × 4096]</text>
+    <text x="413" y="345" class="small" font-style="italic">position 2049 can't be computed</text>
+    <text x="413" y="361" class="small" font-style="italic">until 2048's token is sampled —</text>
+    <text x="413" y="377" class="small" font-style="italic">a DATA DEPENDENCY, not a</text>
+    <text x="413" y="393" class="small" font-style="italic">missing optimization.</text>
+  </g>
+  <text x="413" y="410" class="small">ONE fetch of W  →  used 1 time</text>
+
+  <rect x="413" y="422" width="294" height="118" rx="5" fill="#ffffff" stroke="#0b6e99"/>
+  <text x="425" y="443" class="mono">FLOPs = 2P = 15.0 GFLOPs</text>
+  <text x="425" y="463" class="mono">bytes = 15 GB          (fetched AGAIN)</text>
+  <text x="425" y="483" class="mono">intensity = 1 FLOP/byte</text>
+  <text x="425" y="505" class="small" font-weight="600">→ BANDWIDTH-bound</text>
+  <text x="425" y="525" class="mono">15 GB ÷ 3.35 TB/s ≈ 4.5 ms  × 2048</text>
+
+  <!-- per-token comparison strip -->
+  <rect x="40" y="570" width="685" height="46" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="590" class="mono">per token:  prefill 31 ms ÷ 2048 = 0.015 ms      decode 4.5 ms      ratio ≈ 295×</text>
+  <text x="56" y="608" class="small">Identical arithmetic per token. Only the amortization of the 15 GB weight stream differs.</text>
+
+  <!-- ===== Panel C: stop-and-wait ===== -->
+  <line x1="20" y1="640" x2="740" y2="640" stroke="#ddd"/>
+  <text x="20" y="670" class="title">Panel C — Networking shape: bulk transfer vs. stop-and-wait on the same link</text>
+
+  <rect x="40" y="690" width="330" height="150" rx="8" fill="#fdf3e7" stroke="#d9b98a"/>
+  <text x="56" y="713" class="hdr">Prefill ≈ large window</text>
+  <g>
+    <rect x="58" y="728" width="290" height="10" fill="#b5651d" opacity="0.6"/>
+    <rect x="58" y="742" width="290" height="10" fill="#b5651d" opacity="0.6"/>
+    <rect x="58" y="756" width="290" height="10" fill="#b5651d" opacity="0.6"/>
+  </g>
+  <text x="58" y="790" class="small">All 2048 units in flight at once.</text>
+  <text x="58" y="808" class="small">Pipe stays full; the bottleneck moves</text>
+  <text x="58" y="826" class="small">to the far end's processing rate.</text>
+
+  <rect x="395" y="690" width="330" height="150" rx="8" fill="#eef5f9" stroke="#0b6e99"/>
+  <text x="411" y="713" class="hdr">Decode ≈ stop-and-wait (window = 1)</text>
+  <g>
+    <rect x="413" y="728" width="34" height="10" fill="#0b6e99" opacity="0.6"/>
+    <rect x="470" y="742" width="34" height="10" fill="#0b6e99" opacity="0.6"/>
+    <rect x="527" y="756" width="34" height="10" fill="#0b6e99" opacity="0.6"/>
+    <text x="590" y="766" class="monosm">…one at a time</text>
+  </g>
+  <text x="413" y="790" class="small">Each unit must land before the next is</text>
+  <text x="413" y="808" class="small">even formed. Link mostly idle (0.3%).</text>
+  <text x="413" y="826" class="small">Fix isn't a faster link — it's MORE FLOWS:</text>
+  <text x="413" y="844" class="small" font-weight="600">batching = multiplexing to fill the pipe.</text>
+
+  <!-- ===== Panel D: consequences ===== -->
+  <rect x="40" y="872" width="685" height="118" rx="6" fill="#f4f7fa" stroke="#c9d4dd"/>
+  <text x="56" y="894" class="hdr">What this explains in the wild</text>
+  <text x="56" y="915" class="small">• TTFT (time to first token) is a prefill metric; TPOT (time per output token) is a decode metric. Total = TTFT + m × TPOT.</text>
+  <text x="56" y="933" class="small">• Input tokens are priced below output tokens — ~295× cheaper to serve, and prefill batches poorly but is already efficient.</text>
+  <text x="56" y="951" class="small">• Batching lifts decode throughput ~linearly to the ridge; it does almost nothing for prefill (already compute-bound).</text>
+  <text x="56" y="969" class="small">• Phases fight for one GPU → chunked prefill, continuous batching, and prefill/decode disaggregation onto separate pools.</text>
+<metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTowYjAzOWUzNy1jZDM3LTQzMzktOGQ0NS1mNmViYmEwZDI5OWQAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaDANqbHhihYo/4v/BnBuUy4AAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDpkZDc2MmZiZC0wZmNiLTQ4OTEtYmYwYi0zMDIyMjAwNDg2MThscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNopMo/ZPAJUqEzQk8fdyFuBwAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFggwD6HmI3dARtbGyvt2NIyuXnTnhYHslSEdOFOv1yjbRukZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaKzl45D3f58MyRml/BPgRakAAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRMAAAAAAAAAAAAAAAAZGhhc2hYIIBNO8xzWarwmmrzHc2h3VKinht3F7hTC9xuXtUNlJAuZG5hbWVuanVtYmYgbWFuaWZlc3RqZXhjbHVzaW9uc4GiZXN0YXJ0GR6UZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjBiMDM5ZTM3LWNkMzctNDMzOS04ZDQ1LWY2ZWJiYTBkMjk5ZC9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjgzZDFkNWRmLWQwYzctNGRjNS05MTAxLTRhNzY4YzNlODgwZHJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCDAPoeYjd0BG1sbK+3Y0jK5edOeFgeyVIR04U6/XKNtG6JjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggaGLmzy8+J3kLjRwZ19SYodpgncCSHTqH/IPviYPG3SuiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFggRHEt7IU66zwoBPiuXSOxIvNcNt6/zJi3yy8qFlEYJP90Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQH6U3jejXyN2q2ra70vHyWytQlITG3s4q7g0t3JTcvTQeaSETdTC3yKu8y3NjjtYimgBOzVwO7Mk4437FtU8VK8=</c2pa:manifest></metadata></svg>
